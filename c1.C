@@ -1,0 +1,162 @@
+#ifdef __CLING__
+#pragma cling optimize(0)
+#endif
+void c1()
+{
+//=========Macro generated from canvas: c1/c1
+//=========  (Tue Mar 26 17:05:37 2024) by ROOT version 6.30/04
+   TCanvas *c1 = new TCanvas("c1", "c1",10,53,700,500);
+   c1->Range(-6.25,-56.4375,6.25,507.9375);
+   c1->SetFillColor(0);
+   c1->SetBorderMode(0);
+   c1->SetBorderSize(2);
+   c1->SetFrameBorderMode(0);
+   c1->SetFrameBorderMode(0);
+   
+   TH1D *histo__1 = new TH1D("histo__1","titolo",100,-5,5);
+   histo__1->SetBinContent(8,2);
+   histo__1->SetBinContent(16,1);
+   histo__1->SetBinContent(17,1);
+   histo__1->SetBinContent(18,1);
+   histo__1->SetBinContent(19,3);
+   histo__1->SetBinContent(20,4);
+   histo__1->SetBinContent(21,6);
+   histo__1->SetBinContent(22,7);
+   histo__1->SetBinContent(23,13);
+   histo__1->SetBinContent(24,17);
+   histo__1->SetBinContent(25,7);
+   histo__1->SetBinContent(26,20);
+   histo__1->SetBinContent(27,21);
+   histo__1->SetBinContent(28,31);
+   histo__1->SetBinContent(29,49);
+   histo__1->SetBinContent(30,48);
+   histo__1->SetBinContent(31,71);
+   histo__1->SetBinContent(32,60);
+   histo__1->SetBinContent(33,82);
+   histo__1->SetBinContent(34,93);
+   histo__1->SetBinContent(35,118);
+   histo__1->SetBinContent(36,134);
+   histo__1->SetBinContent(37,141);
+   histo__1->SetBinContent(38,189);
+   histo__1->SetBinContent(39,217);
+   histo__1->SetBinContent(40,229);
+   histo__1->SetBinContent(41,252);
+   histo__1->SetBinContent(42,282);
+   histo__1->SetBinContent(43,296);
+   histo__1->SetBinContent(44,297);
+   histo__1->SetBinContent(45,347);
+   histo__1->SetBinContent(46,355);
+   histo__1->SetBinContent(47,396);
+   histo__1->SetBinContent(48,397);
+   histo__1->SetBinContent(49,393);
+   histo__1->SetBinContent(50,404);
+   histo__1->SetBinContent(51,378);
+   histo__1->SetBinContent(52,430);
+   histo__1->SetBinContent(53,386);
+   histo__1->SetBinContent(54,387);
+   histo__1->SetBinContent(55,388);
+   histo__1->SetBinContent(56,314);
+   histo__1->SetBinContent(57,313);
+   histo__1->SetBinContent(58,293);
+   histo__1->SetBinContent(59,263);
+   histo__1->SetBinContent(60,245);
+   histo__1->SetBinContent(61,224);
+   histo__1->SetBinContent(62,219);
+   histo__1->SetBinContent(63,177);
+   histo__1->SetBinContent(64,148);
+   histo__1->SetBinContent(65,132);
+   histo__1->SetBinContent(66,143);
+   histo__1->SetBinContent(67,101);
+   histo__1->SetBinContent(68,98);
+   histo__1->SetBinContent(69,75);
+   histo__1->SetBinContent(70,58);
+   histo__1->SetBinContent(71,51);
+   histo__1->SetBinContent(72,42);
+   histo__1->SetBinContent(73,28);
+   histo__1->SetBinContent(74,32);
+   histo__1->SetBinContent(75,21);
+   histo__1->SetBinContent(76,15);
+   histo__1->SetBinContent(77,18);
+   histo__1->SetBinContent(78,10);
+   histo__1->SetBinContent(79,7);
+   histo__1->SetBinContent(80,7);
+   histo__1->SetBinContent(81,3);
+   histo__1->SetBinContent(83,2);
+   histo__1->SetBinContent(84,1);
+   histo__1->SetBinContent(85,3);
+   histo__1->SetBinContent(86,1);
+   histo__1->SetBinContent(88,1);
+   histo__1->SetBinContent(91,2);
+   histo__1->SetEntries(10000);
+   
+   TF1 *fit1 = new TF1("fit","gaus(0)",-5,5, TF1::EAddToList::kNo);
+   fit1->SetFillColor(19);
+   fit1->SetFillStyle(0);
+   fit1->SetLineColor(2);
+   fit1->SetLineWidth(2);
+   fit1->SetChisquare(57.76287);
+   fit1->SetNDF(70);
+   fit1->GetXaxis()->SetLabelFont(42);
+   fit1->GetXaxis()->SetTitleOffset(1);
+   fit1->GetXaxis()->SetTitleFont(42);
+   fit1->GetYaxis()->SetLabelFont(42);
+   fit1->GetYaxis()->SetTitleFont(42);
+   fit1->SetParameter(0,397.8886);
+   fit1->SetParError(0,4.93044);
+   fit1->SetParLimits(0,0,0);
+   fit1->SetParameter(1,0.01139382);
+   fit1->SetParError(1,0.01004931);
+   fit1->SetParLimits(1,-2,2);
+   fit1->SetParameter(2,0.9974523);
+   fit1->SetParError(2,0.007309124);
+   fit1->SetParLimits(2,0,10.04752);
+   fit1->SetParent(histo__1);
+   histo__1->GetListOfFunctions()->Add(fit1);
+   
+   TPaveStats *ptstats = new TPaveStats(0.6762178,0.5578947,0.9799427,0.9368421,"brNDC");
+   ptstats->SetName("stats");
+   ptstats->SetBorderSize(1);
+   ptstats->SetFillColor(0);
+   ptstats->SetTextAlign(12);
+   ptstats->SetTextFont(42);
+   TText *ptstats_LaTex = ptstats->AddText("histo");
+   ptstats_LaTex->SetTextSize(0.03873684);
+   ptstats_LaTex = ptstats->AddText("Entries = 10000  ");
+   ptstats_LaTex = ptstats->AddText("Mean  = 0.008308");
+   ptstats_LaTex = ptstats->AddText("Std Dev   =  1.005");
+   ptstats_LaTex = ptstats->AddText("#chi^{2} / ndf = 57.76 / 70");
+   ptstats_LaTex = ptstats->AddText("Prob  = 0.8518");
+   ptstats_LaTex = ptstats->AddText("Constant = 397.9 #pm 4.9 ");
+   ptstats_LaTex = ptstats->AddText("Mean     = 0.01139 #pm 0.01005 ");
+   ptstats_LaTex = ptstats->AddText("Sigma    = 0.9975 #pm 0.0073 ");
+   ptstats->SetOptStat(1111);
+   ptstats->SetOptFit(11111);
+   ptstats->Draw();
+   histo__1->GetListOfFunctions()->Add(ptstats);
+   ptstats->SetParent(histo__1);
+
+   Int_t ci;      // for color index setting
+   TColor *color; // for color definition with alpha
+   ci = TColor::GetColor("#000099");
+   histo__1->SetLineColor(ci);
+   histo__1->GetXaxis()->SetLabelFont(42);
+   histo__1->GetXaxis()->SetTitleOffset(1);
+   histo__1->GetXaxis()->SetTitleFont(42);
+   histo__1->GetYaxis()->SetLabelFont(42);
+   histo__1->GetYaxis()->SetTitleFont(42);
+   histo__1->GetZaxis()->SetLabelFont(42);
+   histo__1->GetZaxis()->SetTitleOffset(1);
+   histo__1->GetZaxis()->SetTitleFont(42);
+   histo__1->Draw("");
+   
+   TPaveText *pt = new TPaveText(0.4484527,0.94,0.5515473,0.995,"blNDC");
+   pt->SetName("title");
+   pt->SetBorderSize(0);
+   pt->SetFillColor(0);
+   pt->SetFillStyle(0);
+   pt->SetTextFont(42);
+   TText *pt_LaTex = pt->AddText("titolo");
+   pt->Draw();
+   c1->Modified();
+   c1->SetSelected(c1);
+}
