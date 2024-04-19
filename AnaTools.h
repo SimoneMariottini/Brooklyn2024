@@ -21,8 +21,6 @@ class AnaTools{
   virtual ~AnaTools();
 
   //Data Analysis Methods
-  void BookingHistograms();
-
   void BookWaveform();
   void BookPersistence();
   void BookCharge();
@@ -57,7 +55,9 @@ class AnaTools{
 
   TH2D *persistence_vector_[NCHANNELS];
   
-  
+  bool bookings_[4] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF
+
+
   // double ped_mean[16];
   // double ped_sigma[16];
 

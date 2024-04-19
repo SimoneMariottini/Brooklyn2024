@@ -68,7 +68,7 @@ int main(int argc, char *argv[]){
 
   //create an Analysys Tool object and create histograms
   AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th);
-  myAnaTools->BookingHistograms();
+  myAnaTools->BookPersistence();
   //  myAnaTools->LoadPedestal("pedestal.dat");
 
   

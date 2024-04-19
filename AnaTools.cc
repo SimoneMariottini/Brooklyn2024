@@ -22,8 +22,7 @@
 using namespace std;
 
 //Constructor
-AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th){ 
-
+AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th){
   outfile_ = f;
   event_ = myEvent;
   cf_=cf;
@@ -44,8 +43,7 @@ AnaTools::~AnaTools(){
 
 
 void AnaTools::BookWaveform(){
-
-  //WAVEFORMS HISTOGRAMS 
+  bookings_[0] = 1;
 
   outfile_->cd("..");
 
@@ -72,6 +70,8 @@ void AnaTools::BookWaveform(){
 }
 
 void AnaTools::BookPersistence(){
+  bookings_[1] = 1;
+
   outfile_->cd("..");
 
   gDirectory->mkdir("Persistence_Map");
@@ -80,7 +80,7 @@ void AnaTools::BookPersistence(){
   for(unsigned int k=0; k<NCHANNELS;k++){
     TString name = Form("Persistence_Map_Channel_%d",k);
     TString title = Form("Persistence Map, channel %d; Time[]; Amplitude[]", k);
-    persistence_vector[k] = new TH2D(name, title, 1024, 0, 1024, 500, -0.3, 0.05);
+    persistence_vector_[k] = new TH2D(name, title, 1024, 0, 1024, 500, -0.3, 0.05);
   }
   gDirectory->cd("..");
 
@@ -90,6 +90,8 @@ void AnaTools::BookPersistence(){
 }
 
 void AnaTools::BookCharge(){
+  bookings_[2] = 1;
+
   outfile_->cd("..");
 
   gDirectory->mkdir("Hist_Charge");
@@ -110,6 +112,8 @@ void AnaTools::BookCharge(){
 }
 
 void AnaTools::BookToF(){
+  bookings_[3] = 1;
+
   outfile_->cd("..");
 
   gDirectory->mkdir("Hist_ToF");
@@ -117,14 +121,14 @@ void AnaTools::BookToF(){
   for(int i=0;i<NCHANNELS;i++){
     //CONSTANT FRACTION HISTOGRAMS
     TString name = Form("Hist_TOF_cfm_ch%d",i);
-    TString title = Form("Distribution of time of arrival using Constant Fraction Method, constant=%g, channel %d, not cut; Time of arrival[ns]; Counts [#]",cf,i);
-    h_TOF_cfm[i] = new TH1D(name, title, 500, -10, 10);
+    TString title = Form("Distribution of time of arrival using Constant Fraction Method, constant=%g, channel %d, not cut; Time of arrival[ns]; Counts [#]",cf_,i);
+    h_TOF_cfm_[i] = new TH1D(name, title, 500, -10, 10);
     
     
     //FIXED THRESHOLD HISTOGRAMS
     name = Form("Hist_TOF_ft_ch%d",i);
-    title = Form("Distribution of time of arrival using Fixed Threshold Method, threshold=%gV, channel %d, not cut; Time of arrival[ns]; Counts [#]",th,i);
-    h_TOF_ft[i] = new TH1D(name, title, 500, -10, 10);
+    title = Form("Distribution of time of arrival using Fixed Threshold Method, threshold=%gV, channel %d, not cut; Time of arrival[ns]; Counts [#]",th_,i);
+    h_TOF_ft_[i] = new TH1D(name, title, 500, -10, 10);
   }
   
   gDirectory->cd("..");
@@ -139,18 +143,16 @@ void AnaTools::Process(int nevent){
 
   nev_= nevent;
 
-
-
   double tot_charge=0;
   double timeCFD[16];
   double timeFT[16];
   double charge[16];
 
   //CALCOLO CARICA E TEMPO DI ARRIVO
-  for(unsigned int i =0; i < event->getWaveforms().size(); i++){
-    charge[i] = ComputeCharge(event->getWaveforms().at(i));
-    timeCFD[i] = ComputeTimeCFD(event->getWaveforms().at(i),cf);
-    timeFT[i] = ComputeTimeFT(event->getWaveforms().at(i),th);
+  for(unsigned int i =0; i < event_->getWaveforms().size(); i++){
+    charge[i] = ComputeCharge(event_->getWaveforms().at(i));
+    timeCFD[i] = ComputeTimeCFD(event_->getWaveforms().at(i),cf_);
+    timeFT[i] = ComputeTimeFT(event_->getWaveforms().at(i),th_);
     tot_charge += charge[i];
   }
 
@@ -160,41 +162,41 @@ void AnaTools::Process(int nevent){
   
   outfile_->cd();
 
-  //CHARGE HISTOGRAMS FILLING
-  h_c_tot->Fill(tot_charge);
-  for(unsigned int i =0; i < event->getWaveforms().size(); i++){
-    h_c_vector[i]->Fill(charge[i]);
+  if (bookings_[2] == 1){ //Fills charge histograms
+    h_c_tot_->Fill(tot_charge);
+    for(unsigned int i =0; i < event_->getWaveforms().size(); i++){
+      h_c_vector_[i]->Fill(charge[i]);
+    }
   }
 
 
-
-  //TOF HISTOGRAMS FILLING
-  double timeCFD_ref = 0.5*(timeCFD[0]+timeCFD[15]);
-  double timeFT_ref = 0.5*(timeFT[0]+timeFT[15]);
-  for(unsigned int i =0; i < event->getWaveforms().size(); i++){
-    double tofCFD = timeCFD[i]-timeCFD_ref;
-    double tofFT = timeFT[i]-timeFT_ref;
-    hTOF_cfm[i]->Fill(tofCFD);
-    hTOF_ft[i]->Fill(tofFT);
+  if (bookings_[2] == 1){ //Fills ToF histograms
+    double timeCFD_ref = 0.5*(timeCFD[0]+timeCFD[15]);
+    double timeFT_ref = 0.5*(timeFT[0]+timeFT[15]);
+    for(unsigned int i =0; i < event_->getWaveforms().size(); i++){
+      double tofCFD = timeCFD[i]-timeCFD_ref;
+      double tofFT = timeFT[i]-timeFT_ref;
+      h_TOF_cfm_[i]->Fill(tofCFD);
+      h_TOF_ft_[i]->Fill(tofFT);
+    }
   }
-
   
-  //WAVEFORM HISTOGRAMS FILLING
-  for(unsigned int i =0; i < event->getWaveforms().size(); i++){
-    if(nev>=1 && nev<=20){
-      for(int isa=0;isa<1024;isa++){
-	hist_vector[nev-1][i]->SetBinContent(isa+1, ( event->getWaveforms().at(i)->getv_amplitude())[isa]);
+  if (bookings_[0] == 1){ //Fills Waveform graphs
+    for(unsigned int i =0; i < event_->getWaveforms().size(); i++){
+      if(nev_>1 && nev_<=20){
+        for(int isa=0;isa<1024;isa++){
+	        h_wave_vector_[nev_-1][i]->SetBinContent(isa+1, ( event_->getWaveforms().at(i)->getv_amplitude())[isa]);
+        }
       }
     }
   }
 
-  //PERSISTENCE HISTOGRAM FILLING
-  //if(nev>=1 && nev<=100){
-  for(unsigned int i =0; i < event->getWaveforms().size(); i++){
-    for(int isa=0;isa<1024;isa++){
-      persistence_vector[i]->Fill((double)isa, (event->getWaveforms().at(i)->getv_amplitude())[isa]);
+  if (bookings_[1] == 1){
+    for(unsigned int i =0; i < event_->getWaveforms().size(); i++){
+      for(int isa=0;isa<1024;isa++){
+        persistence_vector_[i]->Fill((double)isa, (event_->getWaveforms().at(i)->getv_amplitude())[isa]);
+      }
     }
-  //}
   }
 
   return;
