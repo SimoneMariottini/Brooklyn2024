@@ -17,11 +17,17 @@ class AnaTools{
  public:
   
   //Constructor and Destructor
-  AnaTools(TFile *f, Event *myEvent, double cf_, double th_);
+  AnaTools(TFile *f, Event *myEvent, double cf, double th);
   virtual ~AnaTools();
 
   //Data Analysis Methods
   void BookingHistograms();
+
+  void BookWaveform();
+  void BookPersistence();
+  void BookCharge();
+  void BookToF();
+
   void Process(int);
   
   void Clear();
@@ -31,24 +37,25 @@ class AnaTools{
 
   void LoadPedestal(string inname);
 
-  void Draw();
-
  private:
   
-  double cf;
-  double th;
-  TFile *outfile;
-  Event *event;
-  int nev;
+  double cf_;
+  double th_;
+
+  TFile *outfile_;
+  Event *event_;
+  int nev_;
 
 
-  TH1D* hc_vector[NCHANNELS];
-  TH1D *hctot;
-  TH1D *hTOF_cfm[NCHANNELS];
-  TH1D *hTOF_ft[NCHANNELS];
-  TH1D *hist_vector[20][NCHANNELS];
+  TH1D* h_c_vector_[NCHANNELS];
+  TH1D *h_c_tot_;
 
-  TH2D *persistence_vector[NCHANNELS];
+  TH1D *h_TOF_cfm_[NCHANNELS];
+  TH1D *h_TOF_ft_[NCHANNELS];
+
+  TH1D *h_wave_vector_[20][NCHANNELS];
+
+  TH2D *persistence_vector_[NCHANNELS];
   
   
   // double ped_mean[16];

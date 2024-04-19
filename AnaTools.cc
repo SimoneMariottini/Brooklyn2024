@@ -8,7 +8,6 @@
 #include <TF1.h>
 #include <TMath.h>
 #include <TSpectrum.h>
-#include "AnaTools.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -16,22 +15,23 @@
 #include <TMinuit.h>
 #include <math.h>
 #include <TAxis.h>
-#include <TStyle.h>
-#include <TColor.h>
-#include <TCanvas.h>
+#include <TString.h>
+
+#include "AnaTools.h"
 
 using namespace std;
 
 //Constructor
-AnaTools::AnaTools(TFile *f, Event *myEvent, double cf_, double th_){ 
+AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th){ 
 
-  outfile = f;
-  event = myEvent;
-  cf=cf_;
-  th=th_;
+  outfile_ = f;
+  event_ = myEvent;
+  cf_=cf;
+  th_=th;
 
-  nev = 0;
-  
+  nev_ = 0;
+
+  return;
 }
 
 
@@ -40,18 +40,40 @@ AnaTools::AnaTools(TFile *f, Event *myEvent, double cf_, double th_){
 //Destructor
 AnaTools::~AnaTools(){
   return;
-
 }
 
 
+void AnaTools::BookWaveform(){
+
+  //WAVEFORMS HISTOGRAMS 
+
+  outfile_->cd("..");
+
+  for (int i = 0; i < 20; i++){
+    TString d_name = Form("Event_%d", i + 1);
+    gDirectory->mkdir(d_name);
+    gDirectory->cd(d_name);
+    for(unsigned int k=0; k< NCHANNELS;k++){
+      TString name = Form("Event_%d_Channel_%d", i + 1, k);
+      TString title = Form("Event %d, Channel %d; time[ns]; Amplitude[V]", i + 1, k);
+      h_wave_vector_[i][k] = new TH1D(name, title, 1024, 0, 1024*SAMPLINGPERIOD);
+    }
+    gDirectory->cd("..");	
+  };
+
+  
+ 
+  gDirectory->cd("..");
 
 
+  outfile_->cd();
 
-void AnaTools::BookingHistograms(){
+  return;
+}
 
-  outfile->cd("..");
+void AnaTools::BookPersistence(){
+  outfile_->cd("..");
 
-  //PERSISTENCE MAP
   gDirectory->mkdir("Persistence_Map");
   gDirectory->cd("Persistence_Map");
 
@@ -62,66 +84,60 @@ void AnaTools::BookingHistograms(){
   }
   gDirectory->cd("..");
 
-  //CHARGE HISTOGRAMS
+  outfile_->cd();
+
+  return;
+}
+
+void AnaTools::BookCharge(){
+  outfile_->cd("..");
+
   gDirectory->mkdir("Hist_Charge");
   gDirectory->cd("Hist_Charge");
   TString name = Form("Hist_total_charge");
   TString title = Form("Total Charge distribution; Charge[nC]; Counts[#]");
-  hctot = new TH1D(name, title, 500, -2., 2.);
-  for(unsigned int k=1; k<=NCHANNELS;k++){
-    TString name = Form("Hist_Channel_%d",k-1);
-    TString title = Form("Charge distribution, channel %d; Charge[nC]; Counts[#]", k-1);
-    hc_vector[k-1] = new TH1D(name, title, 500, -0.1, 0.1);
+  h_c_tot_ = new TH1D(name, title, 500, -2., 2.);
+  for(unsigned int k=0; k<NCHANNELS;k++){
+    TString name = Form("Hist_Channel_%d",k);
+    TString title = Form("Charge distribution, channel %d; Charge[nC]; Counts[#]", k);
+    h_c_vector_[k] = new TH1D(name, title, 500, -0.1, 0.1);
   }
   gDirectory->cd("..");
 
-    
-   
-  //TOF HISTOGRAMS
+  outfile_->cd();
+
+  return;
+}
+
+void AnaTools::BookToF(){
+  outfile_->cd("..");
+
   gDirectory->mkdir("Hist_ToF");
   gDirectory->cd("Hist_ToF");
-  for(int i=1;i<=NCHANNELS;i++){
+  for(int i=0;i<NCHANNELS;i++){
     //CONSTANT FRACTION HISTOGRAMS
-    
     TString name = Form("Hist_TOF_cfm_ch%d",i);
     TString title = Form("Distribution of time of arrival using Constant Fraction Method, constant=%g, channel %d, not cut; Time of arrival[ns]; Counts [#]",cf,i);
-    hTOF_cfm[i-1] = new TH1D(name, title, 500, -10, 10);
+    h_TOF_cfm[i] = new TH1D(name, title, 500, -10, 10);
     
     
     //FIXED THRESHOLD HISTOGRAMS
     name = Form("Hist_TOF_ft_ch%d",i);
     title = Form("Distribution of time of arrival using Fixed Threshold Method, threshold=%gV, channel %d, not cut; Time of arrival[ns]; Counts [#]",th,i);
-    hTOF_ft[i-1] = new TH1D(name, title, 500, -10, 10);
+    h_TOF_ft[i] = new TH1D(name, title, 500, -10, 10);
   }
   
   gDirectory->cd("..");
- 
-  
-  for(int i=1; i<=20; i++){       
-    //WAVEFORMS HISTOGRAMS                
-    char dir[10]="Evento";
-    char *newEvent=strcat(dir, to_string(i).c_str());        
-    gDirectory->mkdir(&newEvent[0]);
-    gDirectory->cd(&newEvent[0]);
-    for(unsigned int k=1; k<=NCHANNELS;k++){
-      TString name = Form("Event_%d_Channel_%d", i,k-1);
-      TString title = Form("Event %d, Channel %d; time[ns]; Amplitude[V]", i,k-1);
-      hist_vector[i-1][k-1] = new TH1D(name, title, 1024, 0, 1024*SAMPLINGPERIOD);
-    }
-    gDirectory->cd("..");	
-  }
 
-  
- 
-  gDirectory->cd("..");
-	
-	
+  outfile_->cd();
+
+  return;
 }
 
 //Method for Data Analysis: Gets charges and light yields and puts them into histograms
 void AnaTools::Process(int nevent){
 
-  nev= nevent;
+  nev_= nevent;
 
 
 
@@ -138,16 +154,16 @@ void AnaTools::Process(int nevent){
     tot_charge += charge[i];
   }
 
-  event->settot_charge(tot_charge);
+  event_->settot_charge(tot_charge);
 
 
   
-  outfile->cd();
+  outfile_->cd();
 
   //CHARGE HISTOGRAMS FILLING
-  hctot->Fill(tot_charge);
+  h_c_tot->Fill(tot_charge);
   for(unsigned int i =0; i < event->getWaveforms().size(); i++){
-    hc_vector[i]->Fill(charge[i]);
+    h_c_vector[i]->Fill(charge[i]);
   }
 
 
@@ -382,16 +398,6 @@ void AnaTools::LoadPedestal(string inname){
     }*/
   
 }   	
-
-void AnaTools::Draw(){
-  gStyle->SetPalette(kRainBow);
-  for(unsigned int i =0; i < event->getWaveforms().size(); i++){
-    auto c1 = new TCanvas("c1","c1",600,400);
-    //persistence_vector[i]->SetContour(255);
-    persistence_vector[i]->Draw("CONT2"); 
-    delete c1;
-  }
-}
 
 
    	

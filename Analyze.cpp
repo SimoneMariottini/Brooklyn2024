@@ -20,6 +20,7 @@ using namespace std;
 
 int main(int argc, char *argv[]){
 
+  string path("./");
   string inname("in.dat");
   string outname("out.root");
 
@@ -31,6 +32,9 @@ int main(int argc, char *argv[]){
 
 
   for(int i=0; i< argc; i++){
+    if(strcmp("-path",argv[i])==0){
+      path.assign(argv[++i]);
+    }
     if(strcmp("-in",argv[i])==0){
       inname.assign(argv[++i]);
     }
@@ -48,6 +52,8 @@ int main(int argc, char *argv[]){
     }
   }
 
+  inname = path + inname;
+  outname = path + outname;
 
   //open output file
   TFile *f = new TFile(outname.data(), "RECREATE"); //DISCLAIMER: RECREATE WILL OVERWRITE THE CONTENT OF THE OUTPUT FILE. IT'S BETTER TO DISTINGUISH EACH OUTPUT FILE BY THE CONSTANT OF TOF_cfm
@@ -88,8 +94,6 @@ int main(int argc, char *argv[]){
   }
   cout << "\r" <<"Processed 100" << "%" << " of file" <<flush;
   cout << " " << endl;
-
-  myAnaTools->Draw();
 	
   cout<< "Total No. Events read:" << nevent-1 << endl; 
  
