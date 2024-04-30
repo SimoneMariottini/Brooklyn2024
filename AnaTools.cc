@@ -16,6 +16,10 @@
 #include <math.h>
 #include <TAxis.h>
 #include <TString.h>
+#include <TKey.h>
+#include <TCanvas.h>
+#include <TFitResult.h>
+#include <TFitResultPtr.h>
 
 #include "AnaTools.h"
 
@@ -32,9 +36,6 @@ AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th){
 
   return;
 }
-
-
-
 
 //Destructor
 AnaTools::~AnaTools(){
@@ -59,10 +60,7 @@ void AnaTools::BookWaveform(){
     gDirectory->cd("..");	
   };
 
-  
- 
   gDirectory->cd("..");
-
 
   outfile_->cd();
 
@@ -79,8 +77,8 @@ void AnaTools::BookPersistence(){
 
   for(unsigned int k=0; k<NCHANNELS;k++){
     TString name = Form("Persistence_Map_Channel_%d",k);
-    TString title = Form("Persistence Map, channel %d; Time[]; Amplitude[]", k);
-    persistence_vector_[k] = new TH2D(name, title, 1024, 0, 1024, 500, -0.3, 0.05);
+    TString title = Form("Persistence Map, channel %d; Time[ns]; Amplitude[V]", k);
+    persistence_vector_[k] = new TH2D(name, title, 1024, 0, 1024*SAMPLINGPERIOD, 500, -0.3, 0.05);
   }
   gDirectory->cd("..");
 
@@ -96,13 +94,13 @@ void AnaTools::BookCharge(){
 
   gDirectory->mkdir("Hist_Charge");
   gDirectory->cd("Hist_Charge");
-  TString name = Form("Hist_total_charge");
+  TString name = Form("Hist_Total_Charge");
   TString title = Form("Total Charge distribution; Charge[nC]; Counts[#]");
   h_c_tot_ = new TH1D(name, title, 500, -2., 2.);
   for(unsigned int k=0; k<NCHANNELS;k++){
-    TString name = Form("Hist_Channel_%d",k);
+    TString name = Form("Hist_Charge_Channel_%d",k);
     TString title = Form("Charge distribution, channel %d; Charge[nC]; Counts[#]", k);
-    h_c_vector_[k] = new TH1D(name, title, 500, -0.1, 0.1);
+    h_c_vector_[k] = new TH1D(name, title, 500, -0.01, 0.05);
   }
   gDirectory->cd("..");
 
@@ -194,7 +192,7 @@ void AnaTools::Process(int nevent){
   if (bookings_[1] == 1){
     for(unsigned int i =0; i < event_->getWaveforms().size(); i++){
       for(int isa=0;isa<1024;isa++){
-        persistence_vector_[i]->Fill((double)isa, (event_->getWaveforms().at(i)->getv_amplitude())[isa]);
+        persistence_vector_[i]->Fill((event_->getWaveforms().at(i)->getv_time())[isa], (event_->getWaveforms().at(i)->getv_amplitude())[isa]);
       }
     }
   }
@@ -355,51 +353,267 @@ double AnaTools::ComputeTimeFT(Waveform *w, double threshold){
 
 
 
+TFitResultPtr* AnaTools::FitCharge(){
+
+  if (bookings_[2] == 1){
+    static TFitResultPtr fitResults[NCHANNELS];
+    int fitError = 0;
+
+    for (int i = 0; i < NCHANNELS; i++){
+      TCanvas* c1 = new TCanvas();
+      TF1* gaus = new TF1("pedgaus", "[0]*TMath::Gaus(x,[1],[2])", -2, 2);
+      TF1* langaus = new TF1("langaus", lanGausFun, -2, 2, 4);
+      TF1* langausgaus = new TF1("langausgaus", lanGausPlusGausFun, -2, 2, 7);
+      std::cout << "\r" <<"Fitting channel " << i << "." << flush;
+      int nbins = h_c_vector_[i]->GetNbinsX();
+      int midbin, infbin;
+      double y1, y2, xmin, xmid;
+      double par[4] = {0., 0., 0. ,0};
+      double par2[7] = {0., 0., 0., 0., 0., 0., 0.};
+      int j = 1;
+
+      //Looks for the bin that isn't almost empty
+      while(j <= nbins){
+        if(h_c_vector_[i]->GetBinContent(j) > 10){
+          xmin = h_c_vector_[i]->GetBinCenter(j - 5);
+          infbin = j-5;
+          break;
+        }
+        j++;
+      }
+      
+      //Looks for the first maximum bin
+
+      while(j <= nbins){
+        y1 = h_c_vector_[i]->GetBinContent(j);
+        y2 = h_c_vector_[i]->GetBinContent(j + 1);
+        if(y2 < y1){
+          break;
+        }
+        j++;
+      }
+
+      //Looks for the local minimum bin after the first maximum 
+
+      while(j <= nbins){
+        y1 = h_c_vector_[i]->GetBinContent(j);
+        y2 = h_c_vector_[i]->GetBinContent(j + 1);
+        if(y2 > y1){
+          break;
+        }
+        j++;
+      }
+      //save local minimum bin number and position
+      midbin = j; 
+      xmid = h_c_vector_[i]->GetBinCenter(midbin);
+      h_c_vector_[i]->GetXaxis()->SetRange(1, midbin);
+      
+      gaus->SetParameters(h_c_vector_[i]->Integral(), h_c_vector_[i]->GetMean(), h_c_vector_[i]->GetStdDev());
+
+      gaus->SetParNames("Constant", "Mean", "Sigma");
+
+      h_c_vector_[i]->Fit("pedgaus", "Q", "same", xmin, xmid); //Fitting the pedestal gaussian
+
+      //Saving the pedestal gaussian fit parameters
+      par2[4] = gaus->GetParameter("Constant");
+      par2[5] = gaus->GetParameter("Mean");
+      par2[6] = gaus->GetParameter("Sigma");
+
+      h_c_vector_[i]->GetXaxis()->SetRange(0, 0); //reset range
+
+      //Temporarely subtract the pedestal gaussian to better fit the langaus
+
+      vector<int>* reallocBin = new vector<int>;
+      vector<double>* reallocBinContent = new vector<double>;
 
 
+      for(int k = infbin; k < midbin + 20; k++){
+        double adjValue = h_c_vector_[i]->GetBinContent(k) - gaus->Eval(h_c_vector_[i]->GetBinCenter(k));
+        reallocBin->push_back(k);
+        reallocBinContent->push_back(h_c_vector_[i]->GetBinContent(k));
+        if(adjValue >= 0){
+          h_c_vector_[i]->SetBinContent(k, adjValue);
+        }
+        else{
+          h_c_vector_[i]->SetBinContent(k, 0.);
+        }
+      }
 
+      //Evaluating the best starting parameters for the langaus
 
+      par[2] = h_c_vector_[i]->Integral(); //Normalization factor
 
+      j = h_c_vector_[i]->GetMaximumBin();
+      par[1] = h_c_vector_[i]->GetBinCenter(j); //Most Probable value
 
+      par[0] = h_c_vector_[i]->GetStdDev()*0.1; //Width
 
+      par[3] = 0.01; //Gaussian resolution
 
+      //Fit of langaus function
+      langaus->SetNpx(1000);
+      langaus->SetParameters(par);
+      langaus->SetParLimits(3, 0.001, 10);
+      langaus->SetParNames("Width", "MP", "Area", "GSigma");
 
-void AnaTools::LoadPedestal(string inname){
-  // ifstream infile; //File "inname.dat" stream
-  // string fileline; //A line of the File
-  // int ch=0;
-  // infile.open(inname);// file containing numbers in 5 columns
-  // getline(infile,fileline);
-  // if(infile.fail()) // checks to see if file opended 
-  //   { 
-  //     cout << "error= input file of pedestal not found." << endl; 
-  //   } 
-  // while(!infile.eof()) // reads file to end of file
-  //   { 
- 						
-  //     getline(infile,fileline);
-  //     istringstream ss(fileline);
-  //     ss >> ped_mean[ch];
-  //     ss >> ped_mean[ch];
-  //     ss >> ped_sigma[ch];
-  //     ss >> mean2[ch];
-  //     ss >> sigma2[ch];
-  //     ch++;
-  //   }
-  // //EVALUATING GAIN    
-  // for(int ch=0; ch<NCHANNELS; ch++){
-  //   gain_[ch]=mean2[ch]/ECHARGE;
-  // }
-  // infile.close();
+      h_c_vector_[i]->Fit(langaus, "Q", "same", -0.01, 0.05);
 
-  /*for(int i=0;i<16;i++)
-    { 
-    cout << "\tped mean= "<< ped_mean[i] << "\tped sigma= " << ped_sigma[i] << endl;
-   	
-   	 	
-    }*/
+      //Saving the langaus fit parameters
+      par2[0] = langaus->GetParameter("Width");
+      par2[1] = langaus->GetParameter("MP");
+      par2[2] = langaus->GetParameter("Area");
+      par2[3] = langaus->GetParameter("GSigma");
+
+      //Returning the histogram to normal
+      for(int k = 0; k < reallocBin->size(); k++){
+        h_c_vector_[i]->SetBinContent((*reallocBin)[k], (*reallocBinContent)[k]);
+      }
+      delete reallocBin;
+      delete reallocBinContent;
+      
+      //Fit of total distribution using the previous fit parameters (pedestal gaus + langaus)
+      langausgaus->SetNpx(1000);
+      langausgaus->SetParameters(par2);
+      langausgaus->SetParLimits(3, 0.001, 10);
+      langausgaus->SetParNames("Width", "MP", "Area", "G Sigma", "Ped Constant", "Ped Mean", "Ped Sigma");
+
+      fitResults[i] = h_c_vector_[i]->Fit(langausgaus, "QS", "same", -0.01, 0.1);
+      
+      if((int)fitResults[i] != 0){
+        fitError++;
+        cout << "Fit of channel " << i << " was unsuccessful! Exit status " << (int)fitResults[i] << endl;
+      }
+
+      delete gaus;
+      delete langaus;
+      delete langausgaus;
+      delete c1;
+    };
+    cout << "\r" << NCHANNELS - fitError << "/" << NCHANNELS << " fits were successful" << endl;
+    return fitResults; //returns the number of unsuccessfull fits
+  }
+  else{
+    cout << "Can't fit charge histograms." << endl;
+    return nullptr; 
+  }
   
-}   	
+}
+
+double AnaTools::lanGausFun(double *x, double *par) { //copied from laungaus.C example in Root documentation
+ 
+   //Fit parameters:
+   //par[0]=Width (scale) parameter of Landau density
+   //par[1]=Most Probable (MP, location) parameter of Landau density
+   //par[2]=Total area (integral -inf to inf, normalization constant)
+   //par[3]=Width (sigma) of convoluted Gaussian function
+   //
+   //In the Landau distribution (represented by the CERNLIB approximation),
+   //the maximum is located at x=-0.22278298 with the location parameter=0.
+   //This shift is corrected within this function, so that the actual
+   //maximum is identical to the MP parameter.
+ 
+      // Numeric constants
+      double invsq2pi = 0.3989422804014;   // (2 pi)^(-1/2)
+      double mpshift  = -0.22278298;       // Landau maximum location
+ 
+      // Control constants
+      double np = 100.0;      // number of convolution steps
+      double sc =   5.0;      // convolution extends to +-sc Gaussian sigmas
+ 
+      // Variables
+      double xx;
+      double relsigma;
+      double mpc;
+      double fland;
+      double sum = 0.0;
+      double xlow,xupp;
+      double step;
+      double i;
+ 
+ 
+      // MP shift correction
+      mpc = par[1] - mpshift * par[0];
+
+      //Relative value of Gaussian sigma
+      //relsigma = par[3]*0.001; //questo funziona ma praticamente la gaussiana è da trascurare
+      relsigma = par[3]*TMath::Sqrt(TMath::Abs(x[0]));
+ 
+      // Range of convolution integral
+      xlow = x[0] - sc * relsigma;
+      xupp = x[0] + sc * relsigma;
+ 
+      step = (xupp-xlow) / np;
+ 
+      // Convolution integral of Landau and Gaussian by sum
+      for(i=1.0; i<=np/2; i++) {
+         xx = xlow + (i-.5) * step;
+         fland = TMath::Landau(xx,mpc,par[0]) / par[0];
+         sum += fland * TMath::Gaus(x[0],xx,relsigma);
+ 
+         xx = xupp - (i-.5) * step;
+         fland = TMath::Landau(xx,mpc,par[0]) / par[0];
+         sum += fland * TMath::Gaus(x[0],xx,relsigma);
+      }
+ 
+      return (par[2] * step * sum * invsq2pi / relsigma);
+}
+
+double AnaTools::lanGausPlusGausFun(double *x, double *par){
+  double lanpar[4] = {par[0], par[1], par[2], par[3]};
+  return lanGausFun(x, lanpar) + par[4]*TMath::Gaus(x[0],par[5],par[6]);
+}
+
+double* AnaTools::EvaluateEfficiency(){
+  int goodFits = 0;
+  static double result[NCHANNELS*2] = {0};
+  TFitResultPtr* fitResults = FitCharge();
+
+  for(int i = 0; i < NCHANNELS; i++){
+    if((int)fitResults[i] == 0) goodFits++;
+  }
+  
+  if(goodFits != NCHANNELS){
+    cout << "Not all fits were successful! Can't evaluate channel efficiency." << endl;
+    return nullptr;
+  }
+
+  for(int i = 0; i < NCHANNELS; i++){
+    double pedArea, langausArea, sigmaPed, sigmaLangaus;
+    double* param;
+    //double* covMatrix;
+    //retrieve the the different fit functions
+    TF1* langausgaus = h_c_vector_[i]->GetFunction("langausgaus");
+    TF1* pedgaus = new TF1("pedgaus", "[0]*TMath::Gaus(x,[1],[2])", -2, 2);
+    TF1* langaus = new TF1("langaus", lanGausFun, -2, 2, 4);
+
+    //Get fit parameters
+    
+    param = langausgaus->GetParameters();
+    //covMatrix = fitResults[i]->GetCovarianceMatrix().GetMatrixArray();
+
+    TMatrixDSym covMatrix = fitResults[i]->GetCovarianceMatrix();
+
+    //Set the final fit parameters
+    langaus->SetParameters(param);
+
+    pedgaus->SetParameters(param + 4);
+
+    //Calculate the area under the two functions
+    pedArea = pedgaus->Integral(-0.01, 0.05);
+    sigmaPed = pedgaus->IntegralError(-0.01, 0.05, param + 4, covMatrix.GetSub(4, 6, 4, 6).GetMatrixArray());
+
+    langausArea = langaus->Integral(-0.01, 0.05);
+    sigmaLangaus = langaus->IntegralError(-0.01, 0.05, param, covMatrix.GetSub(0, 3, 0, 3).GetMatrixArray());
+
+    result[i] = langausArea/(langausArea + pedArea);
+    result[i + NCHANNELS] = 1/TMath::Power((langausArea + pedArea), 2)*TMath::Sqrt(TMath::Power(pedArea, 2)*TMath::Power(sigmaLangaus, 2) + TMath::Power(langausArea, 2)*TMath::Power(sigmaPed, 2));
+
+    delete pedgaus;
+    delete langaus;
+  }
+
+  return result;
+}
 
 
    	

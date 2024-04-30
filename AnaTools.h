@@ -17,7 +17,12 @@ class AnaTools{
  public:
   
   //Constructor and Destructor
-  AnaTools(TFile *f, Event *myEvent, double cf, double th);
+
+  AnaTools(TFile *f, Event *myEvent, double cf, double th); //Normal constructor
+
+  AnaTools(TFile *f, Event *myEvent); //"Copy from .root file" constructor
+
+
   virtual ~AnaTools();
 
   //Data Analysis Methods
@@ -33,7 +38,13 @@ class AnaTools{
   double ComputeTimeFT(Waveform*, double);
   double ComputeCharge(Waveform*);
 
-  void LoadPedestal(string inname);
+  TFitResultPtr* FitCharge();
+
+  static double lanGausFun(double *x, double *par);
+
+  static double lanGausPlusGausFun(double *x, double *par);
+
+  double* EvaluateEfficiency();
 
  private:
   
@@ -57,12 +68,8 @@ class AnaTools{
   
   bool bookings_[4] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF
 
-
   // double ped_mean[16];
   // double ped_sigma[16];
-
-
-
 };
 
 #endif

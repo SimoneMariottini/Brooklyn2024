@@ -68,7 +68,9 @@ int main(int argc, char *argv[]){
 
   //create an Analysys Tool object and create histograms
   AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th);
-  myAnaTools->BookPersistence();
+  myAnaTools->BookWaveform();
+  myAnaTools->BookCharge();
+  myAnaTools->BookToF();
   //  myAnaTools->LoadPedestal("pedestal.dat");
 
   
@@ -92,10 +94,17 @@ int main(int argc, char *argv[]){
     myEvent->Clear();
     if(nevent%100==0){cout << "\r" <<"Processed " << 100*filepos/filelength << "%" << " of file" <<flush;}
   }
+
   cout << "\r" <<"Processed 100" << "%" << " of file" <<flush;
   cout << " " << endl;
 	
   cout<< "Total No. Events read:" << nevent-1 << endl; 
+
+  double* efficiency = myAnaTools->EvaluateEfficiency();
+
+  for(int i = 0; i< NCHANNELS; i++){
+    cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
+  }
  
   infile.close();
   
