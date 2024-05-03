@@ -93,6 +93,18 @@ AnaTools::AnaTools(TFile *f){
   return;
 }
 
+AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th, TString infoFile): AnaTools::AnaTools(f, myEvent, cf, th){
+  infoFile_ = infoFile;
+  LoadInfo(infoFile_);
+  return;
+}
+
+AnaTools::AnaTools(TFile *f, TString infoFile): AnaTools::AnaTools(f){
+  infoFile_ = infoFile;
+  LoadInfo(infoFile_);
+  return;
+}
+
 //Destructor
 AnaTools::~AnaTools(){
   return;
@@ -677,6 +689,19 @@ double* AnaTools::EvaluateEfficiency(){
   }
 
   return result;
+}
+
+void AnaTools::LoadInfo(TString infoFile){
+
+  TFile* f = new TFile(infoFile, "READ");
+  f->cd();
+
+  TH1D * cutoff_values = (TH1D*)gDirectory->Get("cutoff_values");
+  for(int i = 0; i< NCHANNELS; i++){
+    cutoff_[i] = cutoff_values->GetBinContent(i+1);
+  }
+
+  f->Close();
 }
 
 

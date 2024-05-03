@@ -22,6 +22,9 @@ class AnaTools{
 
   AnaTools(TFile *f); //"Copy from .root file" constructor
 
+  AnaTools(TFile *f, Event *myEvent, double cf, double th, TString infoFile); //Add path to detector_info.root file to save/write to
+  AnaTools(TFile *f, TString infoFile); //Add path to detector_info.root file to save/write to
+
   virtual ~AnaTools();
 
   //Data Analysis Methods
@@ -45,6 +48,8 @@ class AnaTools{
 
   double* EvaluateEfficiency();
 
+  void LoadInfo(TString);
+
  private:
   
   double cf_;
@@ -67,8 +72,11 @@ class AnaTools{
   
   bool bookings_[4] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF
 
-  // double ped_mean[16];
-  // double ped_sigma[16];
+  //Info on system characterization
+
+  TString infoFile_ = "";
+
+  double cutoff_[NCHANNELS];
 };
 
 #endif

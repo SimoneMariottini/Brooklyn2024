@@ -30,16 +30,12 @@ void DrawChargeFitResult(){
     if(dir){
         dir->cd();
     
-        //gDirectory->cd("Hist_Charge");
         gStyle->SetOptFit(1111111);
 
         for(int i = 0; i < NCHANNELS; i++){
            auto c1 = new TCanvas(Form("Channel_%i", i), Form("Channel_%i", i), 1200, 800);
            c1->cd();
            TH1D * h1 = (TH1D*)gDirectory->Get(Form("Hist_Charge_Channel_%i", i));
-
-           h1->GetFunction("langausgaus")->SetLineWidth(4);
-          h1->GetFunction("langausgaus")->SetNpx(1000);
 
           h1->Draw();
         
