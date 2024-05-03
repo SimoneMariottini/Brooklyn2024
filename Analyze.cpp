@@ -59,16 +59,12 @@ int main(int argc, char *argv[]){
   TFile *f = new TFile(outname.data(), "RECREATE"); //DISCLAIMER: RECREATE WILL OVERWRITE THE CONTENT OF THE OUTPUT FILE. IT'S BETTER TO DISTINGUISH EACH OUTPUT FILE BY THE CONSTANT OF TOF_cfm
   f->cd();
 
-  gStyle->SetPalette(55);
-
-
   //create an Event object
   Event * myEvent = new Event();
 
 
   //create an Analysys Tool object and create histograms
   AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th);
-  myAnaTools->BookWaveform();
   myAnaTools->BookCharge();
   myAnaTools->BookToF();
   //  myAnaTools->LoadPedestal("pedestal.dat");
@@ -101,10 +97,11 @@ int main(int argc, char *argv[]){
   cout<< "Total No. Events read:" << nevent-1 << endl; 
 
   double* efficiency = myAnaTools->EvaluateEfficiency();
-
+  /*
   for(int i = 0; i< NCHANNELS; i++){
     cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
   }
+  */
  
   infile.close();
   

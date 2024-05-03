@@ -20,8 +20,7 @@ class AnaTools{
 
   AnaTools(TFile *f, Event *myEvent, double cf, double th); //Normal constructor
 
-  AnaTools(TFile *f, Event *myEvent); //"Copy from .root file" constructor
-
+  AnaTools(TFile *f); //"Copy from .root file" constructor
 
   virtual ~AnaTools();
 

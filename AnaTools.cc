@@ -37,6 +37,62 @@ AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th){
   return;
 }
 
+AnaTools::AnaTools(TFile *f){
+  outfile_ = nullptr;
+  event_ = nullptr;
+  cf_=0;
+  th_=0;
+  nev_ = 0;
+
+  TDirectory *dir;
+  //aggiungere funzione bookable che controlla il tipo di constructor usato e non permette di fare bookings.
+  
+  //Check for charge histogram
+  dir = f->GetDirectory("Hist_Charge");
+  if(dir){
+    dir->cd();
+
+    for(int i = 0; i < NCHANNELS; i++){
+     h_c_vector_[i] = (TH1D*)gDirectory->Get(Form("Hist_Charge_Channel_%i", i));
+    }
+
+    h_c_tot_ = (TH1D*)gDirectory->Get("Hist_Total_Charge");
+
+    bookings_[2] = 1;
+  }
+
+  //Check for ToF histogram
+  dir = f->GetDirectory("Hist_ToF");
+  if(dir){
+    dir->cd();
+
+    for(int i = 0; i < NCHANNELS; i++){
+     h_TOF_cfm_[i] = (TH1D*)gDirectory->Get(Form("Hist_TOF_cfm_ch%i", i));
+    }
+    for(int i = 0; i < NCHANNELS; i++){
+     h_TOF_ft_[i] = (TH1D*)gDirectory->Get(Form("Hist_TOF_ft_ch%i", i));
+    }
+
+    bookings_[3] = 1;
+  }
+
+  //Check for Persistence Maps
+  dir = f->GetDirectory("Persistence_Map");
+  if(dir){
+    dir->cd();
+
+    for(int i = 0; i < NCHANNELS; i++){
+     persistence_vector_[i] = (TH2D*)gDirectory->Get(Form("Persistence_Map_Channel_%i", i));
+    }
+
+    bookings_[1] = 1;
+  }
+
+  gDirectory->cd("..");
+
+  return;
+}
+
 //Destructor
 AnaTools::~AnaTools(){
   return;
@@ -358,13 +414,13 @@ TFitResultPtr* AnaTools::FitCharge(){
   if (bookings_[2] == 1){
     static TFitResultPtr fitResults[NCHANNELS];
     int fitError = 0;
+    TCanvas* c1 = new TCanvas();
 
     for (int i = 0; i < NCHANNELS; i++){
-      TCanvas* c1 = new TCanvas();
       TF1* gaus = new TF1("pedgaus", "[0]*TMath::Gaus(x,[1],[2])", -2, 2);
       TF1* langaus = new TF1("langaus", lanGausFun, -2, 2, 4);
       TF1* langausgaus = new TF1("langausgaus", lanGausPlusGausFun, -2, 2, 7);
-      std::cout << "\r" <<"Fitting channel " << i << "." << flush;
+      cout << "\r" <<"Fitting channel " << i << "." << flush;
       int nbins = h_c_vector_[i]->GetNbinsX();
       int midbin, infbin;
       double y1, y2, xmin, xmid;
@@ -487,8 +543,8 @@ TFitResultPtr* AnaTools::FitCharge(){
       delete gaus;
       delete langaus;
       delete langausgaus;
-      delete c1;
     };
+    delete c1;
     cout << "\r" << NCHANNELS - fitError << "/" << NCHANNELS << " fits were successful" << endl;
     return fitResults; //returns the number of unsuccessfull fits
   }
@@ -522,7 +578,7 @@ double AnaTools::lanGausFun(double *x, double *par) { //copied from laungaus.C e
  
       // Variables
       double xx;
-      double relsigma;
+      double relsigma = 0.000000001;
       double mpc;
       double fland;
       double sum = 0.0;
@@ -536,7 +592,9 @@ double AnaTools::lanGausFun(double *x, double *par) { //copied from laungaus.C e
 
       //Relative value of Gaussian sigma
       //relsigma = par[3]*0.001; //questo funziona ma praticamente la gaussiana è da trascurare
-      relsigma = par[3]*TMath::Sqrt(TMath::Abs(x[0]));
+      if(x[0] >= 0){
+        relsigma = par[3]*TMath::Sqrt(TMath::Abs(x[0]));
+       
  
       // Range of convolution integral
       xlow = x[0] - sc * relsigma;
@@ -554,8 +612,14 @@ double AnaTools::lanGausFun(double *x, double *par) { //copied from laungaus.C e
          fland = TMath::Landau(xx,mpc,par[0]) / par[0];
          sum += fland * TMath::Gaus(x[0],xx,relsigma);
       }
- 
       return (par[2] * step * sum * invsq2pi / relsigma);
+      }
+
+      else{
+        return (par[2]*TMath::Landau(x[0],mpc,par[0])/par[0]);
+      }
+ 
+      
 }
 
 double AnaTools::lanGausPlusGausFun(double *x, double *par){
