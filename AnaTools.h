@@ -17,7 +17,6 @@ class AnaTools{
  public:
   
   //Constructor and Destructor
-
   AnaTools(TFile *f, Event *myEvent, double cf, double th); //Normal constructor
 
   AnaTools(TFile *f); //"Copy from .root file" constructor
@@ -48,7 +47,18 @@ class AnaTools{
 
   double* EvaluateEfficiency();
 
+  double* EvaluateMaxSignificanceBinCenter();
+
   void LoadInfo(TString);
+  void SaveInfo(TString infoFile, TString mode = "UPDATE");
+
+  //Getters:
+  const TString GetInfoFile() {return infoFile_;};
+  const double GetCutoff(int i) {return cutoff_[i];};
+
+  //Setters:
+  void SetCutoff(int i, const double& x);
+  void SetInfoFile(TString);
 
  private:
   
@@ -73,9 +83,7 @@ class AnaTools{
   bool bookings_[4] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF
 
   //Info on system characterization
-
   TString infoFile_ = "";
-
   double cutoff_[NCHANNELS];
 };
 

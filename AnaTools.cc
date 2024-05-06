@@ -702,6 +702,78 @@ void AnaTools::LoadInfo(TString infoFile){
   }
 
   f->Close();
+  delete f;
+
+  return;
+}
+
+void AnaTools::SaveInfo(TString infoFile, TString mode){
+
+  //da fare controlla se il file già ci sta e in caso crea o modifica  
+
+  TFile* file = new TFile(infoFile, mode);
+  file->cd();
+
+  TH1D* h_cutoff = new TH1D("cutoff_values", "Cutoff Values", NCHANNELS, -0.5, NCHANNELS - 0.5);
+  for(int i = 0; i < NCHANNELS; i++){
+    h_cutoff->SetBinContent(i+1, cutoff_[i]);
+  }
+
+  file->Write();
+
+  delete h_cutoff;
+
+  file->Close();
+  delete file;
+
+  return;
+}
+
+void AnaTools::SetCutoff(int i, const double& x){
+  if(i < 0 || i>=NCHANNELS){
+    cout << "Can't set cutoff value, no "<< i << "th channel exists." << endl;
+    return;
+  }
+
+  cutoff_[i] = x;
+  return;
+}
+
+double* AnaTools::EvaluateMaxSignificanceBinCenter(){
+  if (bookings_[2] == 0){
+    cout << "Can't evaluate significance, charge histograms weren't booked." << endl;
+    return nullptr;
+  }
+
+  //da fare: calcola fit se non è stato già fatto
+
+  static double maxSignificanceCenter[NCHANNELS];
+
+  for(int i = 0; i < NCHANNELS; i++){
+
+    TF1* langausgaus = h_c_vector_[i]->GetFunction("langausgaus");
+    TF1* pedgaus = new TF1(Form("pedgaus_%i", i), "[0]*TMath::Gaus(x,[1],[2])", -0.01, 0.05);
+    TF1* langaus = new TF1(Form("langaus_%i", i), lanGausFun, -0.01, 0.05, 4);
+
+    double* param = langausgaus->GetParameters();
+    langaus->SetParameters(param);
+    pedgaus->SetParameters(param + 4);
+
+    TH1D* sig = new TH1D(Form("Significance_channel_%i", i), Form("Significance channel %i", i), 500, -0.01, 0.05);
+
+    for(int j = 1; j <= 500; j++){
+      sig->SetBinContent(j, langaus->Integral(sig->GetBinCenter(j), 0.05, 1.0E-1)/TMath::Sqrt(langausgaus->Integral(sig->GetBinCenter(j), 0.05, 1.0E-1)));
+    }
+
+    maxSignificanceCenter[i] = sig->GetBinCenter(sig->GetMaximumBin());
+
+    delete sig;
+    delete pedgaus;
+    delete langaus;
+  }
+
+  return maxSignificanceCenter;
+
 }
 
 
