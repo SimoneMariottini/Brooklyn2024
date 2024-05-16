@@ -31,6 +31,7 @@ class AnaTools{
   void BookPersistence();
   void BookCharge();
   void BookToF();
+  void BookTime();
 
   void Process(int);
   
@@ -48,6 +49,8 @@ class AnaTools{
   double* EvaluateEfficiency();
 
   double* EvaluateMaxSignificanceBinCenter();
+
+  double* EvaluateToF();
 
   void LoadInfo(TString);
   void SaveInfo(TString infoFile, TString mode = "UPDATE");
@@ -76,11 +79,18 @@ class AnaTools{
   TH1D *h_TOF_cfm_[NCHANNELS];
   TH1D *h_TOF_ft_[NCHANNELS];
 
+  TH1D *h_time_;
+  TH1D *h_time1_[NCHANNELS];
+  TH1D *h_time2_[NCHANNELS];
+
+
   TH1D *h_wave_vector_[20][NCHANNELS];
 
   TH2D *persistence_vector_[NCHANNELS];
-  
-  bool bookings_[4] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF
+
+  //TH1D *h_TOF_[NCHANNELS];
+
+  bool bookings_[5] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF, 4: Time
 
   //Info on system characterization
   TString infoFile_ = "";

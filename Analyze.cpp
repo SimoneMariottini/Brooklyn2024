@@ -64,14 +64,14 @@ int main(int argc, char *argv[]){
 
 
   //create an Analysys Tool object and create histograms
-  AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th);
-  myAnaTools->BookCharge();
-  myAnaTools->BookToF();
-  //  myAnaTools->LoadPedestal("pedestal.dat");
+  AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th, "test_info.root");
 
-  
+  myAnaTools->BookToF();
+  myAnaTools->BookTime(); //funzione che crea gli istogrammi per i tempi 'nuovi'
+  myAnaTools->BookCharge();
+
   //open input file
-  //to do according to the file format, example:
+
   ifstream infile;
   infile.open(inname);
   if(!infile.is_open()){
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]){
 	
   cout<< "Total No. Events read:" << nevent-1 << endl; 
 
-  double* efficiency = myAnaTools->EvaluateEfficiency();
+  //double* efficiency = myAnaTools->EvaluateEfficiency();
   /*
   for(int i = 0; i< NCHANNELS; i++){
     cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
