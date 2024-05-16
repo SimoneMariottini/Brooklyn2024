@@ -29,7 +29,10 @@ class AnaTools{
   //Data Analysis Methods
   void BookWaveform();
   void BookPersistence();
+
   void BookCharge();
+  void BookCharge(const double&, const double&);
+
   void BookToF();
 
   void Process(int);
@@ -60,6 +63,8 @@ class AnaTools{
   void SetCutoff(int i, const double& x);
   void SetInfoFile(TString);
 
+  void SetChargeRange(const double&, const double&);
+
  private:
   
   double cf_;
@@ -72,6 +77,8 @@ class AnaTools{
 
   TH1D* h_c_vector_[NCHANNELS];
   TH1D *h_c_tot_;
+
+  double h_charge_range_[2] = {-0.01, 0.05};
 
   TH1D *h_TOF_cfm_[NCHANNELS];
   TH1D *h_TOF_ft_[NCHANNELS];

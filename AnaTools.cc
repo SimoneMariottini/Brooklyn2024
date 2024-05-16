@@ -168,12 +168,18 @@ void AnaTools::BookCharge(){
   for(unsigned int k=0; k<NCHANNELS;k++){
     TString name = Form("Hist_Charge_Channel_%d",k);
     TString title = Form("Charge distribution, channel %d; Charge[nC]; Counts[#]", k);
-    h_c_vector_[k] = new TH1D(name, title, 500, -0.01, 0.05);
+    h_c_vector_[k] = new TH1D(name, title, 500, h_charge_range_[0], h_charge_range_[1]);
   }
   gDirectory->cd("..");
 
   outfile_->cd();
 
+  return;
+}
+
+void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
+  this->SetChargeRange(xmin, xmax);
+  this->BookCharge();
   return;
 }
 
@@ -774,6 +780,14 @@ double* AnaTools::EvaluateMaxSignificanceBinCenter(){
 
   return maxSignificanceCenter;
 
+}
+
+void AnaTools::SetChargeRange(const double& xmin, const double& xmax){
+
+  h_charge_range_[0] = xmin;
+  h_charge_range_[1] = xmax;
+
+  return;
 }
 
 

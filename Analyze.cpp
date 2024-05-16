@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
   string outname("out.root");
 
   int nevent=1;
-  double cf=0;
+  double cf=0.5;
   double th=0;
   unsigned long int filepos=0;
   unsigned long int filelength;
@@ -65,7 +65,9 @@ int main(int argc, char *argv[]){
 
   //create an Analysys Tool object and create histograms
   AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th);
-  myAnaTools->BookCharge();
+
+  myAnaTools->BookWaveform();
+  myAnaTools->BookCharge(-0.01, 0.5);
   myAnaTools->BookToF();
   //  myAnaTools->LoadPedestal("pedestal.dat");
 
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]){
 	
   cout<< "Total No. Events read:" << nevent-1 << endl; 
 
-  double* efficiency = myAnaTools->EvaluateEfficiency();
+  //double* efficiency = myAnaTools->EvaluateEfficiency();
   /*
   for(int i = 0; i< NCHANNELS; i++){
     cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
