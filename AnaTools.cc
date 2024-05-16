@@ -203,48 +203,6 @@ void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge
   return;
 }
 
-void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
-  this->SetChargeRange(xmin, xmax);
-  this->BookCharge();
-  return;
-}
-
-void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
-  this->SetChargeRange(xmin, xmax);
-  this->BookCharge();
-  return;
-}
-
-void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
-  this->SetChargeRange(xmin, xmax);
-  this->BookCharge();
-  return;
-}
-
-void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
-  this->SetChargeRange(xmin, xmax);
-  this->BookCharge();
-  return;
-}
-
-void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
-  this->SetChargeRange(xmin, xmax);
-  this->BookCharge();
-  return;
-}
-
-void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
-  this->SetChargeRange(xmin, xmax);
-  this->BookCharge();
-  return;
-}
-
-void AnaTools::BookCharge(const double& xmin, const double& xmax){ //Book charge setting custom histogram range
-  this->SetChargeRange(xmin, xmax);
-  this->BookCharge();
-  return;
-}
-
 void AnaTools::BookToF(){
   bookings_[3] = 1;
 
