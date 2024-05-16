@@ -3,6 +3,8 @@
     "files.associations": {
         "DrawChargeFitResult.C": "cpp",
         "PlotSignificance.C": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "FitChargeMacro.C": "cpp",
+        "EvaluateTime.C": "cpp"
     }
 }

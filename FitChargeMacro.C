@@ -14,7 +14,7 @@ using namespace std;
 void FitChargeMacro(){
 
     TString inname("run_190424_trgch0-15_thr15_gate80.root");
-    TString path("/Users/simonemariottini/Documents/Università/Magistrale/Lab2/Measurements/runs/");
+    TString path("./");
 
     TFile* f = new TFile(path + inname, "UPDATE");
 

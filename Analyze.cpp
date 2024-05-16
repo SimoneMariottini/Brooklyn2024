@@ -64,16 +64,14 @@ int main(int argc, char *argv[]){
 
 
   //create an Analysys Tool object and create histograms
-  AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th);
+  AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th, "test_info.root");
 
-  myAnaTools->BookWaveform();
-  myAnaTools->BookCharge(-0.01, 0.5);
   myAnaTools->BookToF();
-  //  myAnaTools->LoadPedestal("pedestal.dat");
+  myAnaTools->BookTime(); //funzione che crea gli istogrammi per i tempi 'nuovi'
+  myAnaTools->BookCharge();
 
-  
   //open input file
-  //to do according to the file format, example:
+
   ifstream infile;
   infile.open(inname);
   if(!infile.is_open()){
