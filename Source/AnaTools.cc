@@ -21,9 +21,16 @@
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
 
-#include "AnaTools.h"
+#include "../Header/AnaTools.h"
 
 using namespace std;
+
+void AnaTools::PrintTest(){
+
+  cout << "test andato a buon fine" << endl;
+
+  return;
+}
 
 // Constructor
 AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th)

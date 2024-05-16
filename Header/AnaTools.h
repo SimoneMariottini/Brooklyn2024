@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <TFile.h>
 #include <TH1D.h>
-#include "Waveform.h"
-#include "Event.h"
+#include "../Header/Waveform.h"
+#include "../Header/Event.h"
 #include <fstream>
 #include <sstream>
 
@@ -25,6 +25,8 @@ class AnaTools{
   AnaTools(TFile *f, TString infoFile); //Add path to detector_info.root file to save/write to
 
   virtual ~AnaTools();
+
+  void PrintTest();
 
   //Data Analysis Methods
   void BookWaveform();

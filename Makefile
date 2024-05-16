@@ -13,7 +13,7 @@ LD            =  g++
 LDFLAGS       = -g
 SOFLAGS       = -shared $(ROOTGLIBS) -lSpectrum -dynamiclib
 
-NGLIBB        += ./libAnalyze.so 
+NGLIBB        += libAnalyze.so 
 NGLIBB        += $(ROOTGLIBS) 
 NGLIBB        += -lMinuit -lSpectrum
 GLIBB          = $(filter-out -lNew, $(NGLIBB))
@@ -24,14 +24,14 @@ Analyze:  Analyze.o Lib
 Analyze.o: Analyze.cpp
 	$(CXX) $(CXXFLAGS) -c Analyze.cpp
 
-Waveform.o: Waveform.cc Waveform.h
-	$(CXX) $(CXXFLAGS) -c Waveform.cc
+Waveform.o: Source/Waveform.cc Header/Waveform.h
+	$(CXX) $(CXXFLAGS) -c Source/Waveform.cc
 
-Event.o: Event.cc Event.h
-	$(CXX) $(CXXFLAGS) -c Event.cc
+Event.o: Source/Event.cc Header/Event.h
+	$(CXX) $(CXXFLAGS) -c Source/Event.cc
 
-AnaTools.o: AnaTools.cc AnaTools.h
-	$(CXX) $(CXXFLAGS) -c AnaTools.cc
+AnaTools.o: Source/AnaTools.cc Header/AnaTools.h
+	$(CXX) $(CXXFLAGS) -c Source/AnaTools.cc
 
 Lib: Analyze.o Waveform.o Event.o AnaTools.o
 	$(CXX) $(SOFLAGS) Analyze.o Waveform.o AnaTools.o Event.o -o libAnalyze.so  

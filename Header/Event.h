@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <TFile.h>
 #include <TH1D.h>
-#include "Waveform.h"
+#include "../Header/Waveform.h"
 
 using namespace std;
 

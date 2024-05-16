@@ -7,7 +7,7 @@
 #include <TF1.h>
 #include <TMath.h>
 #include <TSpectrum.h>
-#include "Event.h"
+#include "../Header/Event.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>

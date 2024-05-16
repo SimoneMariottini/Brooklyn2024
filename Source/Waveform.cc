@@ -7,7 +7,7 @@
 #include <TF1.h>
 #include <TMath.h>
 #include <TSpectrum.h>
-#include "Waveform.h"
+#include "../Header/Waveform.h"
 #include <iostream>
 #include <cstdlib>
 #include <string>
