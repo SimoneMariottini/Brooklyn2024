@@ -5,10 +5,12 @@
 #include <stdio.h>
 #include <TFile.h>
 #include <TH1D.h>
+#include <TH2.h>
 #include "../Header/Waveform.h"
 #include "../Header/Event.h"
 #include <fstream>
 #include <sstream>
+
 
 using namespace std;
 
@@ -50,6 +52,8 @@ class AnaTools{
   static double lanGausFun(double *x, double *par);
 
   static double lanGausPlusGausFun(double *x, double *par);
+
+  static double poisGausFun(double *x, double *par);
 
   double* EvaluateEfficiency();
 
