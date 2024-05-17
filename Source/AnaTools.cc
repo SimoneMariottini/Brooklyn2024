@@ -906,6 +906,32 @@ void AnaTools::SetChargeRange(const double& xmin, const double& xmax){
   return;
 }
 
+double AnaTools::poisGausFun(double *x, double *par){
+  /*
+  There's a total of 6 parameters:
+  - The pedestal expected value, mu_0;
+  - The pedestal standard deviation, sigma_0;
+  - The single photon charge expected value, mu_1;
+  - The single photon charge standard deviation, sigma_1;
+  - The poisson distribution expected value, lambda;
+  - The integration constant.
+  */
+
+  double invsq2pi = 0.3989422804014; // (2 pi)^(-1/2)
+ 
+  double coeff = par[5] * invsq2pi * TMath::Exp(-par[4]); 
+
+  double sigma, sum = 0;
+
+  for (int i = 0; i < 16; i++)
+  {
+    sigma = TMath::Sqrt(TMath::Power(par[1], 2) + TMath::Power(par[3], 2) * i);
+    sum += TMath::Power(par[4], i) / (TMath::Factorial(i) * sigma) * TMath::Gaus(x[0], par[0]+i*par[2], sigma);
+  }
+
+  return sum * coeff;
+}
+
 
    	
    	
