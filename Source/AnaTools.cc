@@ -923,7 +923,7 @@ double AnaTools::poisGausFun(double *x, double *par){
 
   double sigma, sum = 0;
 
-  for (int i = 0; i < 16; i++)
+  for (int i = 0; i < 36; i++)
   {
     sigma = TMath::Sqrt(TMath::Power(par[1], 2) + TMath::Power(par[3], 2) * i);
     sum += TMath::Power(par[4], i) / (TMath::Factorial(i) * sigma) * TMath::Gaus(x[0], par[0]+i*par[2], sigma);
