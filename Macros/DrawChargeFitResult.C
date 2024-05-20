@@ -33,17 +33,17 @@ void DrawChargeFitResult(){
         gStyle->SetOptFit(1111111);
 
         for(int i = 0; i < NCHANNELS; i++){
-           auto c1 = new TCanvas(Form("Channel_%i", i), Form("Channel_%i", i), 1200, 800);
-           c1->cd();
-           TH1D * h1 = (TH1D*)gDirectory->Get(Form("Hist_Charge_Channel_%i", i));
+            auto c1 = new TCanvas(Form("Channel_%i", i), Form("Channel_%i", i), 1200, 800);
+            c1->cd();
+            TH1D * h1 = (TH1D*)gDirectory->Get(Form("Hist_Charge_Channel_%i", i));
 
-          h1->Draw();
+            h1->Draw();
         
-          TF1* langausgaus = h1->GetFunction("langausgaus");
-          TF1* pedgaus = new TF1(Form("pedgaus_%i", i), "[0]*TMath::Gaus(x,[1],[2])", -0.01, 0.05);
-          TF1* langaus = new TF1(Form("langaus_%i", i), AnaTools::lanGausFun, -0.01, 0.05, 4);
+            TF1* langausgaus = h1->GetFunction("langausgaus");
+            TF1* pedgaus = new TF1(Form("pedgaus_%i", i), "[0]*TMath::Gaus(x,[1],[2])", -0.01, 0.05);
+            TF1* langaus = new TF1(Form("langaus_%i", i), AnaTools::lanGausFun, -0.01, 0.05, 4);
 
-          pedgaus->SetLineColor(kBlue);
+            pedgaus->SetLineColor(kBlue);
             langaus->SetLineColor(kGreen + 3);
 
             double* param = langausgaus->GetParameters();
