@@ -11,7 +11,7 @@ void FitChargePoisson(){
 
     AnaTools *data = new AnaTools(f);
 
-    double par[6] = {-0.0001, 0.0005, 0.0020, 0.0005, 1, 11.9}; //Function's initial parameters
+    double par[6] = {-0.0001, 0.0005, 0.0017, 0.0005, 1, 11.9}; //Function's initial parameters
 
     TDirectory* dir;
     dir = f->GetDirectory("Hist_Charge");

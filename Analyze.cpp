@@ -67,7 +67,7 @@ int main(int argc, char *argv[]){
   AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th, "test_info.root");
 
   myAnaTools->BookToF();
-  //myAnaTools->BookTime(); //funzione che crea gli istogrammi per i tempi 'nuovi'
+  myAnaTools->BookTime(); //funzione che crea gli istogrammi per i tempi 'nuovi'
   myAnaTools->BookCharge();
 
   //open input file

@@ -199,8 +199,6 @@ void AnaTools::BookCharge()
 
   outfile_->cd();
 
-  cout << "Booked charge" << endl;
-
   return;
 }
 
@@ -250,8 +248,19 @@ void AnaTools::BookTime()
   TString name = "Hist_Time";
   TString title = "Distribution of time of arrival";
 
-  TString name1 = "Hist_time1";
-  TString title1 = "Distribution of time of arrival 1";
+  for(int j = 1; j <= 2; j++){
+    gDirectory->mkdir(Form("Hist_Time_Method_%i", j));
+    gDirectory->cd(Form("Hist_Time_Method_%i", j));
+
+    for(int i = 0; i < NCHANNELS; i++){
+
+      TString name = Form("Hist_time_Method_%i_Channel_%i", j, i);
+      TString title = Form("Distribution of time of arrival, method %i, channel %i", j, i);
+      
+      h_time_vector_[j - 1][i] = new TH1D(name, title, 500, -100, 100);
+    }
+    gDirectory->cd("..");
+  }
 
   h_time_ = new TH1D(name, title, 500, -100, 100);
 
@@ -323,7 +332,7 @@ void AnaTools::Process(int nevent)
         TimeInternal += timeCFD[i];
         novercutoff++;
 
-        h_time1_[i]->Fill(timeCFD[i] - TimeExternal);
+        h_time_vector_[0][i]->Fill(timeCFD[i] - TimeExternal);
       }
     }
     totalTime = TimeInternal + TimeExternal * 2;
@@ -332,7 +341,7 @@ void AnaTools::Process(int nevent)
       if (charge[i] > cutoff_[i])
       {
         PartialInternalTime = totalTime - timeCFD[i];
-        h_time2_[i]->Fill(PartialInternalTime / (novercutoff + 1) - timeCFD[i]);
+        h_time_vector_[1][i]->Fill(PartialInternalTime / (novercutoff + 1) - timeCFD[i]);
       }
     }
 
