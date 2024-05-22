@@ -19,7 +19,7 @@ void FitChargePoisson(){
     //double par[6] = {0.0015, 0.0005, 0.0022, 0.0005, 2, 12};
 
     fun->SetParameters(par);
-    fun->SetParLimits(2,0.0015,0.0018);
+    fun->SetParLimits(2,0.0017,0.0018);
     fun->SetNpx(10000);
     
     TDirectory* dir;
