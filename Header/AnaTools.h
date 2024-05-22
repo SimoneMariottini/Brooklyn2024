@@ -93,8 +93,7 @@ class AnaTools{
   TH1D *h_TOF_ft_[NCHANNELS];
 
   TH1D *h_time_;
-  TH1D *h_time1_[NCHANNELS];
-  TH1D *h_time2_[NCHANNELS];
+  TH1D *h_time_vector_[2][NCHANNELS];
 
 
   TH1D *h_wave_vector_[20][NCHANNELS];
