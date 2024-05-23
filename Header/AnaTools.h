@@ -68,6 +68,9 @@ class AnaTools{
   const TString GetInfoFile() {return infoFile_;};
   const double GetCutoff(int i) {return cutoff_[i];};
 
+  const TH1D* GetChargeHistogram(const int& i){return h_c_vector_[i];}
+  //const TH1D* GetChargeHistogram(const TString name){ if(name == "tot") return h_c_tot_;} //da implementare correttamente
+
   //Setters:
   void SetCutoff(int i, const double& x);
   void SetInfoFile(TString);
@@ -83,7 +86,6 @@ class AnaTools{
   Event *event_;
   int nev_;
 
-
   TH1D* h_c_vector_[NCHANNELS];
   TH1D *h_c_tot_;
 
@@ -95,12 +97,9 @@ class AnaTools{
   TH1D *h_time_;
   TH1D *h_time_vector_[2][NCHANNELS];
 
-
   TH1D *h_wave_vector_[20][NCHANNELS];
 
   TH2D *persistence_vector_[NCHANNELS];
-
-  //TH1D *h_TOF_[NCHANNELS];
 
   bool bookings_[5] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF, 4: Time
 
