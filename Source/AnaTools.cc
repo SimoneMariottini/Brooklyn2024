@@ -348,6 +348,8 @@ void AnaTools::Process(int nevent)
     TimeInternal /= novercutoff;
     h_time_->Fill(TimeExternal - TimeInternal);
   }
+    cout << cf_;
+
 
   if (bookings_[0] == 1)
   { // Fills Waveform graphs
