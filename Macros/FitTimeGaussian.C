@@ -1,4 +1,4 @@
-#include "../Header/AnaTools.h"
+#include "./Header/AnaTools.h"
 
 #define NCHANNELS 16
 
