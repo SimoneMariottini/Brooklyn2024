@@ -34,7 +34,7 @@ void FitTimeGaussian(){
         {
             auto c1 = new TCanvas(Form("Channel_%i", i), Form("Channel_%i", i), 1200, 800);
     
-            TH1D * h1 = (TH1D*)gDirectory->Get(Form("Hist_Time_Method_1_Channel_%i", i));
+            TH1D * h1 = (TH1D*)gDirectory->Get(Form("./Hist_Time_Method_1/Hist_Time_Method_1_Channel_%i", i));
 
             h1->Fit("Gaus","","same",-0.01,0.05);
 
