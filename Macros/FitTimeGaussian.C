@@ -15,7 +15,8 @@ void FitTimeGaussian(){
     TDirectory* dir;
     dir = f->GetDirectory("Hist_time");
 
-    TF1 * fun = new TF1("Gaus", AnaTools::GausFun, -0.01, 0.05, 6);
+    //TF1 * fun = new TF1("Gaus", AnaTools::GausFun, -0.01, 0.05, 6);
+    TF1 *fun = new TF1("Gaus", "[2]*TMath::Gaus(x,[0],[1])");
 
     double par[2] = {-0.8, 0.8};
 
@@ -27,6 +28,7 @@ void FitTimeGaussian(){
         dir->cd();
     
         gStyle->SetOptFit(11111111);
+        
 
         for (int i = 0; i < NCHANNELS; i++)
         {
