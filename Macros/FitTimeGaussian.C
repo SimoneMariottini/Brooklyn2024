@@ -5,7 +5,7 @@
 void FitTimeGaussian(){
 
     TString path("./Runs/");
-    TString inname("run_190424_trgch0-15_thr15_gate80.root");
+    TString inname("run_190424_trgch0-15_thr15_gate80_fit.root");
     TFile *f = new TFile(path + inname, "READ");
     f->cd();
 
