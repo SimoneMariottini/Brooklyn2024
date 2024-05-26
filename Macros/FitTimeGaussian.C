@@ -13,7 +13,7 @@ void FitTimeGaussian(){
 
  
     TDirectory* dir;
-    dir = f->GetDirectory("Hist_time");
+    dir = f->GetDirectory("./Hist_Time/Hist_Time_Method_1");
 
     //TF1 * fun = new TF1("Gaus", AnaTools::GausFun, -0.01, 0.05, 6);
     TF1 *fun = new TF1("Gaus", "[2]*TMath::Gaus(x,[0],[1])");
