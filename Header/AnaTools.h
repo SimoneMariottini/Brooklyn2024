@@ -55,7 +55,7 @@ class AnaTools{
 
   static double poisGausFun(double *x, double *par);
 
-  static double Gaus(double *x, double *par);
+  static double GausFun(double *x, double *par);
 
   double* EvaluateEfficiency();
 

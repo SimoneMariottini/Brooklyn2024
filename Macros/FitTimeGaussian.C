@@ -1,8 +1,8 @@
-#include "./Header/AnaTools.h"
+#include "../Header/AnaTools.h"
 
 #define NCHANNELS 16
 
-void FitChargePoisson(){
+void FitTimeGaussian(){
 
     TString path("./Runs/");
     TString inname("run_190424_trgch0-15_thr15_gate80.root");
@@ -15,11 +15,13 @@ void FitChargePoisson(){
     TDirectory* dir;
     dir = f->GetDirectory("Hist_time");
 
-    TF1 * fun = new TF1("Gaus", AnaTools::Gaus, -0.01, 0.05, 6);
+    TF1 * fun = new TF1("Gaus", AnaTools::GausFun, -0.01, 0.05, 6);
 
-    //fun->SetParameters(par);
+    double par[2] = {-0.8, 0.8};
+
+    fun->SetParameters(par);
     fun->SetNpx(10000);
-    //fun->SetParNames("Pedestal #mu", "Pedestal #sigma", "Photon charge #mu", "Photon charge #sigma", "#lambda", "Integral");
+    fun->SetParNames("#mu", "#sigma");
 
     if(dir){
         dir->cd();
