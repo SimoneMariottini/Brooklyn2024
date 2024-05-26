@@ -42,5 +42,7 @@ void FitTimeGaussian(){
 
             fun->SetParameters(par);
         }
+          cout << "Loaded info from file!" << endl;
+    
     }   
 }
