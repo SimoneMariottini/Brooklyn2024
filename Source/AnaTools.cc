@@ -816,7 +816,7 @@ void AnaTools::LoadInfo(TString infoFile)
   return;
 }
 
-void AnaTools::SaveInfo(TString infoFile, TString infoType, TString mode){
+void AnaTools::SaveInfo(TString infoType, TString infoFile, TString mode){
   /*infoType options:
     - "cutoff";
     - "efficiency";

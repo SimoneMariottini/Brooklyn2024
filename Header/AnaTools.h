@@ -112,9 +112,9 @@ class AnaTools{
 
   //Info on system characterization
   TString infoFile_ = "info_file.root";
-  double cutoff_[NCHANNELS];
-  double efficiency_[NCHANNELS];
-  double gain_[NCHANNELS];
+  double cutoff_[NCHANNELS] = {0};
+  double efficiency_[NCHANNELS] = {0};
+  double gain_[NCHANNELS] = {0};
 };
 
 #endif
