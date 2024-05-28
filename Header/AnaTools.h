@@ -11,7 +11,6 @@
 #include <fstream>
 #include <sstream>
 
-
 using namespace std;
 
 class AnaTools{
@@ -19,6 +18,9 @@ class AnaTools{
  public:
   
   //Constructor and Destructor
+  AnaTools();
+  AnaTools(TString infoFile){infoFile_ = infoFile;}
+
   AnaTools(TFile *f, Event *myEvent, double cf, double th); //Normal constructor
 
   AnaTools(TFile *f); //"Copy from .root file" constructor
@@ -27,8 +29,6 @@ class AnaTools{
   AnaTools(TFile *f, TString infoFile); //Add path to detector_info.root file to save/write to
 
   virtual ~AnaTools();
-
-  void PrintTest();
 
   //Data Analysis Methods
   void BookWaveform();
@@ -41,8 +41,8 @@ class AnaTools{
   void BookTime();
 
   void Process(int);
-  
   void Clear();
+  
   double ComputeTimeCFD(Waveform*, double);
   double ComputeTimeFT(Waveform*, double);
   double ComputeCharge(Waveform*);
@@ -55,6 +55,8 @@ class AnaTools{
 
   static double poisGausFun(double *x, double *par);
 
+  static double stepFun(double *x);
+
   double* EvaluateEfficiency();
 
   double* EvaluateMaxSignificanceBinCenter();
@@ -62,17 +64,20 @@ class AnaTools{
   double* EvaluateToF();
 
   void LoadInfo(TString);
-  void SaveInfo(TString infoFile, TString mode = "UPDATE");
+  void SaveInfo(TString infoType, TString infoFile = "", TString mode = "UPDATE");
 
   //Getters:
   const TString GetInfoFile() {return infoFile_;};
   const double GetCutoff(int i) {return cutoff_[i];};
 
   const TH1D* GetChargeHistogram(const int& i){return h_c_vector_[i];}
-  //const TH1D* GetChargeHistogram(const TString name){ if(name == "tot") return h_c_tot_;} //da implementare correttamente
+  const TH1D* GetChargeHistogram(const TString name){ if(name.Contains("tot")) return h_c_tot_; else return nullptr;}
 
   //Setters:
   void SetCutoff(int i, const double& x);
+  void SetEfficiency(int i, const double &x);
+  void SetGain(int i, const double &x);
+
   void SetInfoFile(TString);
 
   void SetChargeRange(const double&, const double&);
@@ -104,8 +109,10 @@ class AnaTools{
   bool bookings_[5] = {0}; //0: Waveform, 1: Persistence, 2: Charge, 3: ToF, 4: Time
 
   //Info on system characterization
-  TString infoFile_ = "";
+  TString infoFile_ = "info_file.root";
   double cutoff_[NCHANNELS];
+  double efficiency_[NCHANNELS];
+  double gain_[NCHANNELS];
 };
 
 #endif
