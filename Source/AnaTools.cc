@@ -309,8 +309,7 @@ void AnaTools::Process(int nevent)
     }
   }
 
-  if (bookings_[4] == 1)
-  {
+  if (bookings_[4] == 1){
 
     int novercutoff = 0;
     double TimeInternal = 0;
@@ -341,8 +340,7 @@ void AnaTools::Process(int nevent)
     h_time_->Fill(TimeExternal - TimeInternal);
   }
 
-  if (bookings_[0] == 1)
-  { // Fills Waveform graphs
+  if (bookings_[0] == 1){ // Fills Waveform graphs
     for (unsigned int i = 0; i < event_->getWaveforms().size(); i++)
     {
       if (nev_ > 1 && nev_ <= 20)

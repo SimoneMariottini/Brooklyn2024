@@ -57,6 +57,8 @@ class AnaTools{
 
   static double stepFun(double *x);
 
+  static double GausFun(double *x, double *par);
+
   double* EvaluateEfficiency();
 
   double* EvaluateMaxSignificanceBinCenter();
