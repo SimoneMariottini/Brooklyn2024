@@ -25,13 +25,6 @@
 
 using namespace std;
 
-void AnaTools::PrintTest(){
-
-  cout << "test andato a buon fine" << endl;
-
-  return;
-}
-
 // Constructor
 AnaTools::AnaTools(TFile *f, Event *myEvent, double cf, double th)
 {
@@ -271,7 +264,6 @@ void AnaTools::BookTime()
   return;
 }
 
-// Method for Data Analysis: Gets charges and light yields and puts them into histograms
 void AnaTools::Process(int nevent)
 {
 
@@ -317,8 +309,7 @@ void AnaTools::Process(int nevent)
     }
   }
 
-  if (bookings_[4] == 1)
-  {
+  if (bookings_[4] == 1){
 
     int novercutoff = 0;
     double TimeInternal = 0;
@@ -349,8 +340,7 @@ void AnaTools::Process(int nevent)
     h_time_->Fill(TimeExternal - TimeInternal);
   }
 
-  if (bookings_[0] == 1)
-  { // Fills Waveform graphs
+  if (bookings_[0] == 1){ // Fills Waveform graphs
     for (unsigned int i = 0; i < event_->getWaveforms().size(); i++)
     {
       if (nev_ > 1 && nev_ <= 20)
@@ -697,12 +687,12 @@ double AnaTools::lanGausFun(double *x, double *par)
   double mpshift = -0.22278298;      // Landau maximum location
 
   // Control constants
-  double np = 100.0; // number of convolution steps
+  double np = 1000.0; // number of convolution steps
   double sc = 5.0;   // convolution extends to +-sc Gaussian sigmas
 
   // Variables
   double xx;
-  double relsigma = 0.000000001;
+  double relsigma = 0;
   double mpc;
   double fland;
   double sum = 0.0;
@@ -714,41 +704,37 @@ double AnaTools::lanGausFun(double *x, double *par)
   mpc = par[1] - mpshift * par[0];
 
   // Relative value of Gaussian sigma
-  // relsigma = par[3]*0.001; //questo funziona ma praticamente la gaussiana è da trascurare
-  if (x[0] >= 0)
+  //relsigma = par[3]* (TMath::Sqrt(stepFun(x)) + 0.0001);
+
+  // Range of convolution integral
+  xlow = -0.01;
+  xupp = 0.05;
+
+  step = (xupp - xlow) / np;
+
+  relsigma = par[3] * (TMath::Sqrt(TMath::Abs(x[0])));
+
+  // Convolution integral of Landau and Gaussian by sum
+  for (i = 1.0; i <= np / 2; i++)
   {
-    relsigma = par[3] * TMath::Sqrt(TMath::Abs(x[0]));
+    xx = xlow + (i - .5) * step;
+    
+    fland = TMath::Landau(xx, mpc, par[0]) / par[0];
+    sum += fland * TMath::Gaus(xx, x[0], relsigma);
 
-    // Range of convolution integral
-    xlow = x[0] - sc * relsigma;
-    xupp = x[0] + sc * relsigma;
-
-    step = (xupp - xlow) / np;
-
-    // Convolution integral of Landau and Gaussian by sum
-    for (i = 1.0; i <= np / 2; i++)
-    {
-      xx = xlow + (i - .5) * step;
-      fland = TMath::Landau(xx, mpc, par[0]) / par[0];
-      sum += fland * TMath::Gaus(x[0], xx, relsigma);
-
-      xx = xupp - (i - .5) * step;
-      fland = TMath::Landau(xx, mpc, par[0]) / par[0];
-      sum += fland * TMath::Gaus(x[0], xx, relsigma);
-    }
-    return (par[2] * step * sum * invsq2pi / relsigma);
+    xx = xupp - (i - .5) * step;
+    relsigma = par[3] * (TMath::Abs(x[0]));
+    fland = TMath::Landau(xx, mpc, par[0]) / par[0];
+    sum += fland * TMath::Gaus(xx, x[0], relsigma);
   }
-
-  else
-  {
-    return (par[2] * TMath::Landau(x[0], mpc, par[0]) / par[0]);
-  }
+  return (par[2] * step * sum * invsq2pi / relsigma);
 }
 
 double AnaTools::lanGausPlusGausFun(double *x, double *par)
 {
+  double invsq2pi = 0.3989422804014;
   double lanpar[4] = {par[0], par[1], par[2], par[3]};
-  return lanGausFun(x, lanpar) + par[4] * TMath::Gaus(x[0], par[5], par[6]);
+  return lanGausFun(x, lanpar) + par[4] * TMath::Gaus(x[0], par[5], par[6])*invsq2pi/par[6];
 }
 
 double *AnaTools::EvaluateEfficiency()
@@ -830,23 +816,60 @@ void AnaTools::LoadInfo(TString infoFile)
   return;
 }
 
-void AnaTools::SaveInfo(TString infoFile, TString mode)
-{
+void AnaTools::SaveInfo(TString infoType, TString infoFile, TString mode){
+  /*infoType options:
+    - "cutoff";
+    - "efficiency";
+    - "gain".
+  */
+
+  if(infoFile == ""){
+    infoFile = infoFile_;
+  }
 
   // da fare controlla se il file già ci sta e in caso crea o modifica
 
   TFile *file = new TFile(infoFile, mode);
   file->cd();
 
-  TH1D *h_cutoff = new TH1D("cutoff_values", "Cutoff Values", NCHANNELS, -0.5, NCHANNELS - 0.5);
-  for (int i = 0; i < NCHANNELS; i++)
-  {
-    h_cutoff->SetBinContent(i + 1, cutoff_[i]);
+  //Save cutoff values
+  if(infoType.Contains("cutoff")){
+    TH1D *h_cutoff = new TH1D("cutoff_values", "Cutoff Values", NCHANNELS, -0.5, NCHANNELS - 0.5);
+    for (int i = 0; i < NCHANNELS; i++)
+    {
+      h_cutoff->SetBinContent(i + 1, cutoff_[i]);
+    }
+
+    file->Write();
+
+    delete h_cutoff;
   }
 
-  file->Write();
+  //Save efficiency values
+  if(infoType.Contains("efficiency")){
+    TH1D *h_efficiency = new TH1D("efficiency_values", "Efficiency Values", NCHANNELS, -0.5, NCHANNELS - 0.5);
+    for (int i = 0; i < NCHANNELS; i++)
+    {
+      h_efficiency->SetBinContent(i + 1, efficiency_[i]);
+    }
 
-  delete h_cutoff;
+    file->Write();
+
+    delete h_efficiency;
+  }
+
+  //Save gain values
+  if(infoType.Contains("gain")){
+    TH1D *h_gain = new TH1D("gain_values", "Gain Values", NCHANNELS, -0.5, NCHANNELS - 0.5);
+    for (int i = 0; i < NCHANNELS; i++)
+    {
+      h_gain->SetBinContent(i + 1, gain_[i]);
+    }
+
+    file->Write();
+
+    delete h_gain;
+  }
 
   file->Close();
   delete file;
@@ -863,6 +886,28 @@ void AnaTools::SetCutoff(int i, const double &x)
   }
 
   cutoff_[i] = x;
+  return;
+}
+
+void AnaTools::SetEfficiency(int i, const double &x){
+  if (i < 0 || i >= NCHANNELS)
+  {
+    cout << "Can't set efficiency value, no " << i << "th channel exists." << endl;
+    return;
+  }
+
+  efficiency_[i] = x;
+  return;
+}
+
+void AnaTools::SetGain(int i, const double &x){
+  if (i < 0 || i >= NCHANNELS)
+  {
+    cout << "Can't set egain value, no " << i << "th channel exists." << endl;
+    return;
+  }
+
+  gain_[i] = x;
   return;
 }
 
@@ -941,29 +986,8 @@ double AnaTools::poisGausFun(double *x, double *par){
   return sum * coeff;
 }
 
+double AnaTools::stepFun(double* x){ //step function
+  if(x[0] >= 0.00001) return x[0];
+  else return 0.00001;
+} 
 
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
-   	
- 

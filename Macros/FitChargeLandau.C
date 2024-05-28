@@ -4,17 +4,17 @@
 
 #include <TString.h>
 #include <TFile.h>
-#include "AnaTools.h"
+#include "../Header/AnaTools.h"
 #include <iostream>
 
 #define NCHANNELS 16
 
 using namespace std;
 
-void FitChargeMacro(){
+void FitChargeLandau(){
 
     TString inname("run_190424_trgch0-15_thr15_gate80.root");
-    TString path("./");
+    TString path("./Runs/");
 
     TFile* f = new TFile(path + inname, "UPDATE");
 
@@ -24,9 +24,9 @@ void FitChargeMacro(){
 
     double* efficiency = MyAnaTools.EvaluateEfficiency();
 
-    for(int i = 0; i< NCHANNELS; i++){
+    /*for(int i = 0; i< NCHANNELS; i++){
     cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
-    }
+    }*/
 
     f->Write();
     f->Close();
