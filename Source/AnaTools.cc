@@ -800,10 +800,26 @@ void AnaTools::LoadInfo(TString infoFile)
   TFile *info = new TFile(infoFile, "READ");
   info->cd();
 
-  TH1D *cutoff_values = (TH1D *)gDirectory->Get("cutoff_values");
-  for (int i = 0; i < NCHANNELS; i++)
-  {
-    cutoff_[i] = cutoff_values->GetBinContent(i + 1);
+  TH1D *h_cutoff = (TH1D *)gDirectory->Get("cutoff_values");
+  if(h_cutoff){
+    for (int i = 0; i < NCHANNELS; i++){
+      cutoff_[i] = h_cutoff->GetBinContent(i + 1);
+    }
+  }
+
+  TH1D *h_efficiency = (TH1D *)gDirectory->Get("efficiency_values");
+  if(h_efficiency){
+    for (int i = 0; i < NCHANNELS; i++){
+      efficiency_[i] = h_efficiency->GetBinContent(i + 1);
+    }
+  }
+
+  TH1D *h_gain = (TH1D *)gDirectory->Get("gain_values");
+  if(h_gain){
+    for (int i = 0; i < NCHANNELS; i++){
+      gain_[i][0] = h_gain->GetBinContent(i + 1);
+      gain_[i][1] = h_gain->GetBinError(i + 1);
+    }
   }
 
   info->Close();
@@ -863,7 +879,8 @@ void AnaTools::SaveInfo(TString infoType, TString infoFile, TString mode){
     TH1D *h_gain = new TH1D("gain_values", "Gain Values", NCHANNELS, -0.5, NCHANNELS - 0.5);
     for (int i = 0; i < NCHANNELS; i++)
     {
-      h_gain->SetBinContent(i + 1, gain_[i]);
+      h_gain->SetBinContent(i + 1, gain_[i][0]);
+      h_gain->SetBinError(i + 1, gain_[i][1]);
     }
 
     file->Write();
@@ -900,14 +917,15 @@ void AnaTools::SetEfficiency(int i, const double &x){
   return;
 }
 
-void AnaTools::SetGain(int i, const double &x){
+void AnaTools::SetGain(int i, const double &x, const double &sigma_x){
   if (i < 0 || i >= NCHANNELS)
   {
     cout << "Can't set egain value, no " << i << "th channel exists." << endl;
     return;
   }
 
-  gain_[i] = x;
+  gain_[i][0] = x;
+  gain_[i][1] = sigma_x;
   return;
 }
 

@@ -2,10 +2,12 @@
 
 #define NCHANNELS 16
 
+using namespace std;
+
 void FitTimeGaussian(){
 
     TString path("./Runs/");
-    TString inname("run_190424_trgch0-15_thr15_gate80.root");
+    TString inname("RunMuon10000_3.root");
     TFile *f = new TFile(path + inname, "READ");
     f->cd();
 
@@ -34,9 +36,9 @@ void FitTimeGaussian(){
         {
             auto c1 = new TCanvas(Form("Channel_%i", i), Form("Channel_%i", i), 1200, 800);
     
-            TH1D * h1 = (TH1D*)gDirectory->Get(Form("Hist_Time_Method_1/Hist_Time_Method_1_Channel_%i", i));
+            TH1D * h1 = (TH1D*)gDirectory->Get(Form("Hist_Time_Method_1/Hist_time_Method_1_Channel_%i", i));
 
-            h1->Fit("Gaus","","same",-0.01,0.05);
+            h1->Fit("Gaus","","same",-100,100);
 
             h1->Draw();
 

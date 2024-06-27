@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
   string outname("out.root");
 
   int nevent=1;
-  double cf=0.5;
+  double cf=0.2;
   double th=0;
   unsigned long int filepos=0;
   unsigned long int filelength;

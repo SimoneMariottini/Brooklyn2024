@@ -78,7 +78,7 @@ class AnaTools{
   //Setters:
   void SetCutoff(int i, const double& x);
   void SetEfficiency(int i, const double &x);
-  void SetGain(int i, const double &x);
+  void SetGain(int i, const double &x, const double &sigma_x);
 
   void SetInfoFile(TString);
 
@@ -114,7 +114,7 @@ class AnaTools{
   TString infoFile_ = "info_file.root";
   double cutoff_[NCHANNELS] = {0};
   double efficiency_[NCHANNELS] = {0};
-  double gain_[NCHANNELS] = {0};
+  double gain_[NCHANNELS][2] = {{0}};
 };
 
 #endif
