@@ -66,11 +66,15 @@ class AnaTools{
   double* EvaluateToF();
 
   void LoadInfo(TString);
+  void LoadInfo(){LoadInfo(infoFile_);};
   void SaveInfo(TString infoType, TString infoFile = "", TString mode = "UPDATE");
 
   //Getters:
   const TString GetInfoFile() {return infoFile_;};
   const double GetCutoff(int i) {return cutoff_[i];};
+  const double GetGain(int i) {return gain_[i][0];};
+  const double GetGainError(int i) {return gain_[i][1];};
+  const double GetPedestal(int i) {return pedestal_[i];};
 
   const TH1D* GetChargeHistogram(const int& i){return h_c_vector_[i];}
   const TH1D* GetChargeHistogram(const TString name){ if(name.Contains("tot")) return h_c_tot_; else return nullptr;}
@@ -79,6 +83,7 @@ class AnaTools{
   void SetCutoff(int i, const double& x);
   void SetEfficiency(int i, const double &x);
   void SetGain(int i, const double &x, const double &sigma_x);
+  void SetPedestal(int i, const double &x);
 
   void SetInfoFile(TString);
 
@@ -115,6 +120,7 @@ class AnaTools{
   double cutoff_[NCHANNELS] = {0};
   double efficiency_[NCHANNELS] = {0};
   double gain_[NCHANNELS][2] = {{0}};
+  double pedestal_[NCHANNELS] = {0};
 };
 
 #endif

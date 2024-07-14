@@ -24,9 +24,12 @@ void FitChargeLandau(){
 
     double* efficiency = MyAnaTools.EvaluateEfficiency();
 
-    /*for(int i = 0; i< NCHANNELS; i++){
-    cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
-    }*/
+    if(efficiency){
+        for(int i = 0; i< NCHANNELS; i++){
+            cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
+        }
+    }
+    
 
     f->Write();
     f->Close();

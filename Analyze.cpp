@@ -69,6 +69,8 @@ int main(int argc, char *argv[]){
   myAnaTools->BookToF();
   myAnaTools->BookTime(); //funzione che crea gli istogrammi per i tempi 'nuovi'
   myAnaTools->BookCharge();
+  myAnaTools->BookWaveform();
+  myAnaTools->BookPersistence();
 
   //open input file
 
@@ -96,12 +98,12 @@ int main(int argc, char *argv[]){
 	
   cout<< "Total No. Events read:" << nevent-1 << endl; 
 
-  //double* efficiency = myAnaTools->EvaluateEfficiency();
-  /*
+  /*double* efficiency = myAnaTools->EvaluateEfficiency();
+  
   for(int i = 0; i< NCHANNELS; i++){
     cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
-  }
-  */
+  }*/
+  
  
   infile.close();
   
