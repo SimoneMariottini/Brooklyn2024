@@ -1,0 +1,10 @@
+after downloading the files run:
+
+ % make 
+
+It should generate a series of files including the executable "Analyze"
+
+To process a data file run:
+
+ % ./Analyze -path path/ -in infile.dat -out outfile.root
+

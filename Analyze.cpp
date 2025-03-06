@@ -24,30 +24,30 @@ int main(int argc, char *argv[]){
   string inname("in.dat");
   string outname("out.root");
 
-  int nevent=1;
+  int nevent=0;
   double cf=0.2;
-  double th=0;
+  double th=0.;
   unsigned long int filepos=0;
   unsigned long int filelength;
 
 
   for(int i=0; i< argc; i++){
-    if(strcmp("-path",argv[i])==0){
+    if(strcmp("-path",argv[i])==0){ //Path for input and output file -- remember "/" at the end
       path.assign(argv[++i]);
     }
-    if(strcmp("-in",argv[i])==0){
+    if(strcmp("-in",argv[i])==0){ //input file name
       inname.assign(argv[++i]);
     }
-    if(strcmp("-out",argv[i])==0){
+    if(strcmp("-out",argv[i])==0){ //output file name
       outname.assign(argv[++i]);
     }
-    if(strcmp("-nev",argv[i])==0){
+    if(strcmp("-nev",argv[i])==0){ //first event to analyze
       nevent = atoi(argv[++i]);
     }
-     if(strcmp("-frac",argv[i])==0){
+     if(strcmp("-frac",argv[i])==0){ //value for constant fraction -- default 0.2
       cf = atof(argv[++i]);
     }
-     if(strcmp("-th",argv[i])==0){
+     if(strcmp("-th",argv[i])==0){ //value for threshold -- default 0.
       th = atof(argv[++i]);
     }
   }
@@ -63,11 +63,12 @@ int main(int argc, char *argv[]){
   Event * myEvent = new Event();
 
 
-  //create an Analysys Tool object and create histograms
-  AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th, "test_info.root");
+  //create an Analysis Tool object
+  AnaTools *myAnaTools = new AnaTools(f,myEvent, cf, th, "info.root"); //info.root file contains some detector parameters
 
+  //Calls for different kinds of analysis'
   myAnaTools->BookToF();
-  myAnaTools->BookTime(); //funzione che crea gli istogrammi per i tempi 'nuovi'
+  myAnaTools->BookTime(); 
   myAnaTools->BookCharge();
   myAnaTools->BookWaveform();
   myAnaTools->BookPersistence();
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]){
   ifstream infile;
   infile.open(inname);
   if(!infile.is_open()){
-    printf("***************88File %s not found, exiting from the program*****************\n",inname.data());
+    printf("*************** File %s not found, exiting from the program *****************\n",inname.data());
     exit(-1);
   }
   infile.seekg (0, infile.end);
@@ -86,10 +87,10 @@ int main(int argc, char *argv[]){
   
   //loop on events, read an event until file is finished
   while(filepos<filelength){
-    myEvent->ReadEvent(inname, &filepos);
-    nevent++;
+    myEvent->ReadEvent(inname, &filepos); 
     myAnaTools->Process(nevent);
     myEvent->Clear();
+    nevent++;
     if(nevent%100==0){cout << "\r" <<"Processed " << 100*filepos/filelength << "%" << " of file" <<flush;}
   }
 
@@ -97,13 +98,6 @@ int main(int argc, char *argv[]){
   cout << " " << endl;
 	
   cout<< "Total No. Events read:" << nevent-1 << endl; 
-
-  /*double* efficiency = myAnaTools->EvaluateEfficiency();
-  
-  for(int i = 0; i< NCHANNELS; i++){
-    cout << "Channel " << i << " efficiency = " << efficiency[i] << "+/-" << efficiency[i + NCHANNELS] << endl;
-  }*/
-  
  
   infile.close();
   
@@ -112,8 +106,7 @@ int main(int argc, char *argv[]){
   f->Close();
 
   delete myAnaTools;
-
-
+  
   return 0;
 
 }

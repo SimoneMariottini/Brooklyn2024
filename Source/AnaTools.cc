@@ -375,7 +375,7 @@ void AnaTools::Process(int nevent)
   if (bookings_[0] == 1){ // Fills Waveform graphs
     for (unsigned int i = 0; i < event_->getWaveforms().size(); i++)
     {
-      if (nev_ > 0 && nev_ < 20)
+      if (nev_ >= 0 && nev_ < 20)
       {
         for (int isa = 0; isa < 1024; isa++)
         {

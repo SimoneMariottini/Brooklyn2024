@@ -3,11 +3,11 @@
 using namespace std;
 
 void Integrate(){
-    TF2* integrand = new TF2("Integrand", "6/TMath::Pi()/TMath::Power((TMath::Power(x, 2) + TMath::Power(y, 2) + 1), 5./2.)*(1-13.43/16.*x)*(1-13.43/172.*y)", 0., 16./13.43, 0., 172./13.43);
+    TF2* integrand = new TF2("Integrand", "6/TMath::Pi()/TMath::Power((TMath::Power(x, 2) + TMath::Power(y, 2) + 1), 5./2.)*(1-11.43/16.*x)*(1-11.43/172.*y)", 0., 16./11.43, 0., 172./11.43);
 
     integrand->SetNpx(10000);
     integrand->SetNpy(10000);
 
-    cout << "Integral = " << integrand->Integral(0., 16./13.43, 0., 172./13.43) << endl;
+    cout << "Integral = " << integrand->Integral(0., 16./11.43, 0., 172./11.43) << endl;
 
 }
